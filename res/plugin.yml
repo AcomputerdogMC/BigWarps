@@ -1,0 +1,130 @@
+name: BigWarps
+main: net.acomputerdog.bigwarps.PluginBigWarps
+version: 0.0.0
+description: Allows players to create public and private warp points
+author: acomputerdog
+
+commands:
+  back:
+    description: Return to previous warp point
+    permission: bigwarps.command.back
+    usage: /back
+    aliases: [bwback, bwreturn, return]
+  tpa:
+    description: Request to TP to another player
+    permission: bigwarps.tpa
+    usage: /tpa <player>
+    aliases: [bwtpa, bwtp]
+  tpaccept:
+    description: Accept a TP request
+    permission: bigwarps.tpa
+    usage: /tpaccept
+    aliases: [bwtpaccept, bwaccept, tpal]
+  tpdeny:
+    description: Denys a TP request
+    permission: bigwarps.tpa
+    usage: /tpdeny
+    aliases: [bwtpdeny, bwdeny, tpd]
+  tpcancel:
+    description: Cancels a TP request
+    permission: bigwarps.tpa
+    usage: /tpcancel
+    aliases: [bwtpcancel, bwcancel, tpc]
+  warp:
+    description: Warps to a warp point
+    permission: bigwarps.command.warp
+    usage: /warp [player.]<name>
+    aliases: bwwarp
+  mkwarp:
+    description: Creates or edits a warp
+    permission: bigwarps.command.mkwarp
+    usage: /mkwarp <name> [<world> <x> <y> <z>]
+    aliases: [bwmkwarp, makewarp, bwmakewarp]
+  rmwarp:
+    description: Removes a warp
+    permission: bigwarps.command.rmwarp
+    usage: /rmwarp [owner.]<name>
+    aliases: [bwrmwarp, removewarp, bwremovewarp]
+  lswarps:
+    description: Lists player warps
+    permission: bigwarps.command.lswarps
+    usage: /lswarp [player]
+    aliases: [listwarps, lswarp, listwarp]
+  lspublic:
+    description: Lists public warps
+    permission: bigwarps.command.lspublic
+    usage: /lspublic
+    aliases: [listpublic, lspublics, listpublics]
+  setpublic:
+    description: Sets a warp to be public or not public
+    permission: bigwarps.command.setpublic
+    usage: /mkwarp <name>
+    aliases: [bwsetpublic]
+  bwreload:
+    description: Reload the plugin
+    permission: bigwarps.command.reload
+    usage: /bwreload
+  tp:
+    description: Uses normal /tp but records player position for /back
+    permission: bigwarps.tp.use
+    usage: /tp <args>
+    aliases: [bwtp, teleport, bwteleport]
+
+permissions:
+  bigwarps.command.back:
+    description: Use /back
+    default: true
+  bigwarps.tpa:
+    description: Use /tpa, /tpaccept, /tpdeny, and /tpcancel
+    default: true
+  bigwarps.command.warp:
+    description: Use /warp
+    default: true
+  bigwarps.command.mkwarp:
+    description: Use /mkwarp
+    default: true
+  bigwarps.command.rmwarp:
+    description: Use /rmwarp
+    default: true
+  bigwarps.command.lswarps:
+    description: Use /lswarps
+    default: true
+  bigwarps.command.lspublic:
+    description: Use /lspublic
+    default: true
+  bigwarps.command.setpublic:
+    description: Use /setpublic
+    default: true
+  bigwarps.command.reload:
+    description: Use /bwreload
+    default: op
+  bigwarps.tp.force:
+    description: Force user to be able to access /tp
+    default: false
+  bigwarps.tp.use:
+    description: Allow use of /tp (if vanilla permissions apply)
+    default: true
+  bigwarps.warp.ignorelimit.private:
+    description: Ignore limit on private warps
+    default: op
+  bigwarps.warp.ignorelimit.public:
+    description: Ignore limit on public warps
+    default: op
+  bigwarps.warp.nocreate.private:
+    description: Block creating private warps
+    default: false
+  bigwarps.warp.nocreate.public:
+    description: Block creating public warps
+    default: false
+  bigwarps.warp.editothers:
+    description: Edit other player's warps
+    default: op
+  bigwarps.list.showprivate:
+    description: Show own private warps
+    default: true
+  bigwarps.list.showpublic:
+    description: Show public warps
+    default: true
+  bigwarps.list.showother:
+    description: Show other players' private warps
+    default: op
