@@ -133,12 +133,14 @@ public class CommandHandler {
 
     private void cmdTpcancel(Player p) {
         if (checkPermsPlayer(p, "bigwarps.tpa")) {
+            sendRed("You do not have any teleport requests.");
             tpMap.cancelSentTpa(p);
         }
     }
 
     private void cmdTpdeny(Player p) {
         if (checkPermsPlayer(p, "bigwarps.tpa")) {
+            sendRed("No one has requested to teleport to you.");
             tpMap.cancelReceivedTpa(p);
         }
     }
