@@ -326,7 +326,13 @@ public class CommandHandler {
             PlayerWarps publicWarps = warps.getPublicWarps();
             sendYellow("Public warps:");
             for (Warp warp : publicWarps) {
-                s.sendMessage(ChatColor.AQUA + warp.getName() + ": " + ChatColor.BLUE + warp.locationToString() + " - " + ChatColor.DARK_PURPLE + warp.getOwner());
+                String owner = "none";
+                //if a warp owner is set, then use it
+                if (warp.getOwner() != null && !"null".equals(warp.getOwner().getName())) {
+                    owner = warp.getOwner().getName();
+                }
+
+                s.sendMessage(ChatColor.AQUA + warp.getName() + ": " + ChatColor.BLUE + warp.locationToString() + " - " + ChatColor.DARK_PURPLE + owner);
             }
         }
     }

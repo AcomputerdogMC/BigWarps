@@ -11,6 +11,9 @@ public class WarpOwner {
     public WarpOwner(UUID uuid, String name) {
         this.uuid = uuid;
         this.uuidString = uuid.toString();
+        if (name == null) {
+            name = "null";
+        }
         this.name = name;
     }
 
