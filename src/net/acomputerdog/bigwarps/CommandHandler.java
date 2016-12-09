@@ -148,21 +148,6 @@ public class CommandHandler {
     private void cmdWarp(Player p, String[] args) {
         if (checkPermsPlayer(p, "bigwarps.command.warp")) {
             if (args.length == 1) {
-
-                /*
-                String owner = null;
-                String name = args[0];
-
-                int idx = args[0].indexOf('.');
-                if (idx >= 0 && idx < args.length - 1) {
-                    name = args[0].substring(idx + 1);
-                    owner = args[0].substring(0, idx);
-                }
-                    if (owner == null) {
-                        sendRed("That player could not be found!");
-                        return;
-                    }
-                 */
                 String name = args[0].toLowerCase();
 
                 Warp warp = warps.getWarp(p.getUniqueId(), name);
@@ -171,22 +156,6 @@ public class CommandHandler {
                 } else {
                     sendRed("That warp could not be found!");
                 }
-                /*
-                if (owner == null) {
-                    warp = warps.getWarp(p.getUniqueId(), name);
-                } else {
-                    String publicName =
-                }
-
-                if (owner != null) {
-                    Warp warp = warps.getWarp(owner.getUniqueId(), name);
-                    if (warp != null) {
-                        tpMap.onWarp(p, warp);
-                    } else {
-                        sendRed("That warp could not be found!");
-                    }
-                }
-                */
             } else {
                 sendRed("Usage: /warp [owner.]<name>");
             }
@@ -274,30 +243,6 @@ public class CommandHandler {
                 } else {
                     sendRed("Unable to find a warp by that name!");
                 }
-                /*
-                Player owner = null;
-                String name = args[0];
-
-                int idx = args[0].indexOf('.');
-                if (idx >= 0 && idx < args.length - 1) {
-                    name = args[0].substring(idx + 1);
-                    owner = plugin.getServer().getPlayer(args[0].substring(0, idx));
-                    if (owner == null) {
-                        sendRed("That player could not be found.");
-                    }
-                }
-
-
-                if (owner != null) {
-                    if (owner.equals(s) || s.hasPermission("bigwarps.warp.editothers")) {
-                        Warp warp = warps.getWarp(owner.getUniqueId(), name);
-                        warps.removeWarp(warp);
-                        sendAqua("Warp removed.");
-                    } else {
-                        sendRed("You do not have permission to edit other players' warps.");
-                    }
-                }
-                */
             } else {
                 sendRed("Usage: /rmwarp [owner.]<name>");
             }
