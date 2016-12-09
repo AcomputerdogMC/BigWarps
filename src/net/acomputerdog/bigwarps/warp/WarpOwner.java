@@ -48,8 +48,6 @@ public class WarpOwner {
 
     @Override
     public String toString() {
-        return "WarpOwner{" +
-                "uuid=" + uuid +
-                '}';
+        return uuidString;
     }
 }
