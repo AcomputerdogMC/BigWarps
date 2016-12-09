@@ -1,5 +1,7 @@
 package net.acomputerdog.bigwarps.warp;
 
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
@@ -35,7 +37,7 @@ public class WarpList {
     }
 
     public Warp getWarp(UUID owner, String name) {
-        PlayerWarps warps = playerWarpsFor(owner);
+        PlayerWarps warps = getPlayerWarps(owner);
         Warp warp = warps.getWarp(name);
         if (warp == null) {
             //fall back on public warps if owner is null or owner does not have a warp by that name
@@ -49,7 +51,7 @@ public class WarpList {
             publicWarps.addWarp(warp);
             savePublicWarps();
         } else {
-            PlayerWarps warps = playerWarpsFor(warp.getOwner().getUuid());
+            PlayerWarps warps = getPlayerWarps(warp.getOwner().getUuid());
             warps.addWarp(warp);
             savePlayerWarps(warps);
         }
@@ -60,13 +62,13 @@ public class WarpList {
             publicWarps.removeWarp(warp.getName());
             savePublicWarps();
         } else {
-            PlayerWarps warps = playerWarpsFor(warp.getOwner().getUuid());
+            PlayerWarps warps = getPlayerWarps(warp.getOwner().getUuid());
             warps.removeWarp(warp.getName());
             savePlayerWarps(warps);
         }
     }
 
-    public PlayerWarps playerWarpsFor(UUID uuid) {
+    private PlayerWarps getPlayerWarps(UUID uuid) {
         if (uuid == null) {
             throw new IllegalArgumentException("Cannot get warps for null player, use getPublicWarps() instead!");
         }
@@ -78,11 +80,30 @@ public class WarpList {
     }
 
     public PlayerWarps getPrivateWarps(UUID uuid) {
-        return new ImmutablePlayerWarps(playerWarpsFor(uuid));
+        return new ImmutablePlayerWarps(getPlayerWarps(uuid));
     }
 
     public PlayerWarps getPublicWarps() {
         return new ImmutablePlayerWarps(publicWarps);
+    }
+
+    public void togglePublic(Player p, String name) {
+        PlayerWarps playerWarps = getPlayerWarps(p.getUniqueId());
+        Warp warp = playerWarps.removeWarp(name);
+        if (warp != null) {
+            warp.setPublic(true);
+            publicWarps.addWarp(warp);
+            p.sendMessage(ChatColor.AQUA + "Warp is now public.");
+        } else {
+            warp = publicWarps.removeWarp(name);
+            if (warp != null) {
+                warp.setPublic(false);
+                playerWarps.addWarp(warp);
+                p.sendMessage(ChatColor.AQUA + "Warp is now private.");
+            } else {
+                p.sendMessage(ChatColor.RED + "No warp could be found matching that name!");
+            }
+        }
     }
 
     private PlayerWarps loadPlayerWarps(UUID uuid) {

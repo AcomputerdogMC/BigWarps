@@ -335,23 +335,7 @@ public class CommandHandler {
         if (checkPermsPlayer(p, "bigwarps.command.setpublic")) {
             if (args.length == 1) {
                 String name = args[0];
-                PlayerWarps priv = warps.playerWarpsFor(p.getUniqueId());
-                PlayerWarps pub = warps.getPublicWarps();
-                Warp warp = priv.removeWarp(name);
-                if (warp != null) {
-                    warp.setPublic(true);
-                    pub.addWarp(warp);
-                    sendAqua("Warp is now public.");
-                } else {
-                    warp = pub.removeWarp(name);
-                    if (warp != null) {
-                        warp.setPublic(false);
-                        priv.addWarp(warp);
-                        sendAqua("Warp is now private.");
-                    } else {
-                        sendRed("No warp could be found matching that name!");
-                    }
-                }
+                warps.togglePublic(p, name);
             } else {
                 sendRed("Usage: /setpublic <warp name>");
             }
