@@ -9,18 +9,6 @@ import java.util.Map;
 import java.util.UUID;
 
 public class WarpList {
-
-    /*
-
-    TODO all warps must be loaded at start
-    TODO we still need a public warps list
-         SO we will have:
-           map: uuid -> personal
-             null == server
-           list: public
-
-     */
-
     private final JavaPlugin plugin;
 
 
@@ -57,26 +45,24 @@ public class WarpList {
     }
 
     public void addWarp(Warp warp) {
-        WarpOwner owner = warp.getOwner();
-        if (owner != null) {
-            PlayerWarps warps = getPlayerWarps(owner.getUuid());
-            warps.addWarp(warp);
-            savePlayerWarps(warps);
-        } else {
+        if (warp.isPublic()) {
             publicWarps.addWarp(warp);
             savePublicWarps();
+        } else {
+            PlayerWarps warps = getPlayerWarps(warp.getOwner().getUuid());
+            warps.addWarp(warp);
+            savePlayerWarps(warps);
         }
     }
 
     public void removeWarp(Warp warp) {
-        WarpOwner owner = warp.getOwner();
-        if (owner != null) {
-            PlayerWarps warps = getPlayerWarps(owner.getUuid());
-            warps.removeWarp(warp.getName());
-            savePlayerWarps(warps);
-        } else {
+        if (warp.isPublic()) {
             publicWarps.removeWarp(warp.getName());
             savePublicWarps();
+        } else {
+            PlayerWarps warps = getPlayerWarps(warp.getOwner().getUuid());
+            warps.removeWarp(warp.getName());
+            savePlayerWarps(warps);
         }
     }
 
@@ -98,21 +84,6 @@ public class WarpList {
     public PlayerWarps getPublicWarps() {
         return new ImmutablePlayerWarps(publicWarps);
     }
-
-    /*
-    public void makeWarpPublic(Warp warp) {
-        //remove from normal PlayerWarps
-        WarpOwner owner = warp.getOwner();
-        if (owner != null) {
-            PlayerWarps warps = getPlayerWarps(owner.getUuid());
-            warps.removeWarp(warp.getName());
-        }
-
-        //add to public PlayerWarps
-        warp.setPublic(true);
-        publicWarps.addWarp(warp);
-    }
-    */
 
     private PlayerWarps loadPlayerWarps(UUID uuid) {
         File warpFile = new File(privateWarpsDir, uuid.toString() + ".lst");
