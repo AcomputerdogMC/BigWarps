@@ -322,7 +322,7 @@ public class CommandHandler {
     }
 
     private void cmdLspublic(CommandSender s) {
-        if (checkPerms(s, "bigwarps.cmd.lspublic")) {
+        if (checkPerms(s, "bigwarps.command.lspublic")) {
             PlayerWarps publicWarps = warps.getPublicWarps();
             sendYellow("Public warps:");
             for (Warp warp : publicWarps) {
@@ -332,7 +332,7 @@ public class CommandHandler {
     }
 
     private void cmdSetpublic(Player p, String[] args) {
-        if (checkPermsPlayer(p, "bigwarps.cmd.setpublic")) {
+        if (checkPermsPlayer(p, "bigwarps.command.setpublic")) {
             if (args.length == 1) {
                 String name = args[0];
                 PlayerWarps priv = warps.playerWarpsFor(p.getUniqueId());
@@ -359,7 +359,7 @@ public class CommandHandler {
     }
 
     private void cmdReload(CommandSender s) {
-        if (checkPerms(s, "bigwarps.cmd.reload")) {
+        if (checkPerms(s, "bigwarps.command.reload")) {
             sendAqua("Reloading...");
             plugin.onDisable();
             plugin.onEnable();
