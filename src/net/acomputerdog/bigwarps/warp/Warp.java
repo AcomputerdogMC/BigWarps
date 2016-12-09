@@ -122,7 +122,7 @@ public class Warp implements Listener {
 
     @Override
     public String toString() {
-        return name + "," + owner + "," + worldName + "," + x + "," + y + "," + z;
+        return name + "," + owner + "," + worldName + "," + x + "," + y + "," + z + "," + time + "," + isPublic;
     }
 
     public String locationToString() {

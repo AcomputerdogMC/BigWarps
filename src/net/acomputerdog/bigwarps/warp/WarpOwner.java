@@ -33,6 +33,10 @@ public class WarpOwner {
         this.name = name;
     }
 
+    public boolean matches(UUID uuid, String name) {
+        return this.uuid.equals(uuid) || this.name.equalsIgnoreCase(name);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

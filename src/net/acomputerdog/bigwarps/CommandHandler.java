@@ -56,7 +56,7 @@ public class CommandHandler {
                     cmdMkwarp(sender, p, args);
                     break;
                 case "rmwarp":
-                    cmdRmwarp(sender, args);
+                    cmdRmwarp(p, args);
                     break;
                 case "lswarps":
                     cmdLswarps(sender, args);
@@ -148,16 +148,34 @@ public class CommandHandler {
     private void cmdWarp(Player p, String[] args) {
         if (checkPermsPlayer(p, "bigwarps.command.warp")) {
             if (args.length == 1) {
-                Player owner = p;
+
+                /*
+                String owner = null;
                 String name = args[0];
 
                 int idx = args[0].indexOf('.');
                 if (idx >= 0 && idx < args.length - 1) {
                     name = args[0].substring(idx + 1);
-                    owner = plugin.getServer().getPlayer(args[0].substring(0, idx));
+                    owner = args[0].substring(0, idx);
+                }
                     if (owner == null) {
                         sendRed("That player could not be found!");
+                        return;
                     }
+                 */
+                String name = args[0].toLowerCase();
+
+                Warp warp = warps.getWarp(p.getUniqueId(), name);
+                if (warp != null) {
+                    tpMap.onWarp(p, warp);
+                } else {
+                    sendRed("That warp could not be found!");
+                }
+                /*
+                if (owner == null) {
+                    warp = warps.getWarp(p.getUniqueId(), name);
+                } else {
+                    String publicName =
                 }
 
                 if (owner != null) {
@@ -168,6 +186,7 @@ public class CommandHandler {
                         sendRed("That warp could not be found!");
                     }
                 }
+                */
             } else {
                 sendRed("Usage: /warp [owner.]<name>");
             }
@@ -245,9 +264,17 @@ public class CommandHandler {
         return true;
     }
 
-    private void cmdRmwarp(CommandSender s, String[] args) {
-        if (checkPerms(s, "bigwarps.command.rmwarp")) {
+    private void cmdRmwarp(Player p, String[] args) {
+        if (checkPermsPlayer(p, "bigwarps.command.rmwarp")) {
             if (args.length == 1) {
+                Warp warp = warps.getWarp(p.getUniqueId(), args[0]);
+                if (warp != null) {
+                    warps.removeWarp(warp);
+                    sendAqua("Warp removed.");
+                } else {
+                    sendRed("Unable to find a warp by that name!");
+                }
+                /*
                 Player owner = null;
                 String name = args[0];
 
@@ -260,6 +287,7 @@ public class CommandHandler {
                     }
                 }
 
+
                 if (owner != null) {
                     if (owner.equals(s) || s.hasPermission("bigwarps.warp.editothers")) {
                         Warp warp = warps.getWarp(owner.getUniqueId(), name);
@@ -269,6 +297,7 @@ public class CommandHandler {
                         sendRed("You do not have permission to edit other players' warps.");
                     }
                 }
+                */
             } else {
                 sendRed("Usage: /rmwarp [owner.]<name>");
             }

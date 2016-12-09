@@ -21,11 +21,14 @@ public class WarpList {
     private final PlayerWarps publicWarps;
     private final File publicWarpsFile;
 
+    private final QuickWarps quickWarps;
+
     public WarpList(JavaPlugin plugin) {
         this.plugin = plugin;
 
         this.privateWarps = new HashMap<>();
         this.publicWarps = new PlayerWarps(null);
+        this.quickWarps = new QuickWarps();
 
         this.privateWarpsDir = new File(plugin.getDataFolder(), "private_warps/");
         this.publicWarpsFile = new File(plugin.getDataFolder(), "public_warps.lst");
@@ -40,32 +43,33 @@ public class WarpList {
         PlayerWarps warps = getPlayerWarps(owner);
         Warp warp = warps.getWarp(name);
         if (warp == null) {
-            //fall back on public warps if owner is null or owner does not have a warp by that name
+            //fall back on public warps if owner does not have a warp by that name
             warp = publicWarps.getWarp(name);
+            if (warp == null) {
+                String realName = quickWarps.getRealName(name);
+                if (realName != null) {
+                    //fall back on quickwarps if the public name did not match
+                    warp = publicWarps.getWarp(realName);
+                }
+            }
         }
         return warp;
     }
 
     public void addWarp(Warp warp) {
-        if (warp.isPublic()) {
-            publicWarps.addWarp(warp);
-            savePublicWarps();
-        } else {
-            PlayerWarps warps = getPlayerWarps(warp.getOwner().getUuid());
-            warps.addWarp(warp);
-            savePlayerWarps(warps);
-        }
+        PlayerWarps warps = getPlayerWarps(warp.getOwner().getUuid());
+        warps.addWarp(warp);
+        savePlayerWarps(warps);
     }
 
     public void removeWarp(Warp warp) {
-        if (warp.isPublic()) {
-            publicWarps.removeWarp(warp.getName());
-            savePublicWarps();
-        } else {
-            PlayerWarps warps = getPlayerWarps(warp.getOwner().getUuid());
-            warps.removeWarp(warp.getName());
-            savePlayerWarps(warps);
-        }
+        PlayerWarps warps = getPlayerWarps(warp.getOwner().getUuid());
+        warps.removeWarp(warp.getName());
+        savePlayerWarps(warps);
+
+        publicWarps.removeWarp(getRealName(warp)); //use real name
+        quickWarps.removeName(warp.getName()); //use short name
+        savePublicWarps();
     }
 
     private PlayerWarps getPlayerWarps(UUID uuid) {
@@ -89,17 +93,21 @@ public class WarpList {
 
     public void togglePublic(Player p, String name) {
         PlayerWarps playerWarps = getPlayerWarps(p.getUniqueId());
-        Warp warp = playerWarps.removeWarp(name);
+        Warp warp = playerWarps.getWarp(name);
         if (warp != null) {
+            String realName = getRealName(warp);
             if (warp.isPublic()) {
-                publicWarps.removeWarp(name);
+                publicWarps.removeWarp(realName);
                 warp.setPublic(false);
+                quickWarps.increaseCount(name, realName);
                 p.sendMessage(ChatColor.AQUA + "Warp is now private.");
             } else {
-                publicWarps.addWarp(warp);
+                publicWarps.addWarp(realName, warp);
                 warp.setPublic(true);
+                quickWarps.decreaseCount(name, realName);
                 p.sendMessage(ChatColor.AQUA + "Warp is now public.");
             }
+            savePlayerWarps(playerWarps);
             savePublicWarps();
         } else {
             p.sendMessage(ChatColor.RED + "No warp could be found matching that name!");
@@ -111,7 +119,7 @@ public class WarpList {
         PlayerWarps warps = new PlayerWarps(uuid);
         if (warpFile.isFile()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(warpFile))) {
-                readWarps(plugin, reader, warps.getWarpMap());
+                readWarps(plugin, reader, warps.getWarpMap(), false);
                 privateWarps.put(uuid, warps);
             } catch (IOException e) {
                 plugin.getLogger().warning("IOException reading warps for player " + uuid);
@@ -124,7 +132,7 @@ public class WarpList {
     private void loadPublicWarps() {
         if (publicWarpsFile.isFile()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(publicWarpsFile))) {
-                readWarps(plugin, reader, publicWarps.getWarpMap());
+                readWarps(plugin, reader, publicWarps.getWarpMap(), true);
             } catch (IOException e) {
                 plugin.getLogger().warning("IOException reading public warps!");
                 e.printStackTrace();
@@ -158,14 +166,14 @@ public class WarpList {
         }
     }
 
-    private static void writeWarps(Writer writer, Collection<Warp> warps) throws IOException {
+    private void writeWarps(Writer writer, Collection<Warp> warps) throws IOException {
         for (Warp warp : warps) {
             writer.write(warp.toString());
             writer.write("\n");
         }
     }
 
-    private static void readWarps(JavaPlugin plugin, BufferedReader reader, Map<String, Warp> warps) throws IOException {
+    private void readWarps(JavaPlugin plugin, BufferedReader reader, Map<String, Warp> warps, boolean isPublic) throws IOException {
         while (reader.ready()) {
             String line = reader.readLine().trim();
             if (!line.startsWith("#")) {
@@ -173,12 +181,25 @@ public class WarpList {
                 if (warp == null) {
                     plugin.getLogger().warning("Malformed warp: \"" + line + "\"");
                 } else {
-                    Warp oldWarp = warps.put(warp.getName(), warp);
+                    String name = warp.getName();
+                    if (isPublic) {
+                        name = getRealName(warp);
+                        quickWarps.increaseCount(warp.getName(), name);
+                    }
+                    Warp oldWarp = warps.put(name, warp);
                     if (oldWarp != null) {
                         plugin.getLogger().warning("Duplicate warp: \"" + warp.getName() + "\"");
                     }
                 }
             }
         }
+    }
+
+    private String getRealName(Warp warp) {
+        String ownerName = "none";
+        if (warp.getOwner() != null) {
+            ownerName = warp.getOwner().getName();
+        }
+        return (ownerName + "." + warp.getName()).toLowerCase();
     }
 }

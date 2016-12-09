@@ -27,10 +27,18 @@ public class PlayerWarps implements Iterable<Warp> {
         return warps.remove(name.toLowerCase());
     }
 
-    public Warp addWarp(Warp warp) {
-        String name = warp.getName().toLowerCase();
+    public Warp addWarp(String name, Warp warp) {
         warps.remove(name);
         return warps.put(name, warp);
+    }
+
+
+    public Warp addWarp(Warp warp) {
+        return addWarp(warp.getName().toLowerCase(), warp);
+    }
+
+    public boolean hasWarp(String name) {
+        return warps.containsKey(name);
     }
 
     // package-private method for WarpList
