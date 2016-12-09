@@ -91,18 +91,18 @@ public class WarpList {
         PlayerWarps playerWarps = getPlayerWarps(p.getUniqueId());
         Warp warp = playerWarps.removeWarp(name);
         if (warp != null) {
-            warp.setPublic(true);
-            publicWarps.addWarp(warp);
-            p.sendMessage(ChatColor.AQUA + "Warp is now public.");
-        } else {
-            warp = publicWarps.removeWarp(name);
-            if (warp != null) {
+            if (warp.isPublic()) {
+                publicWarps.removeWarp(name);
                 warp.setPublic(false);
-                playerWarps.addWarp(warp);
                 p.sendMessage(ChatColor.AQUA + "Warp is now private.");
             } else {
-                p.sendMessage(ChatColor.RED + "No warp could be found matching that name!");
+                publicWarps.addWarp(warp);
+                warp.setPublic(true);
+                p.sendMessage(ChatColor.AQUA + "Warp is now public.");
             }
+            savePublicWarps();
+        } else {
+            p.sendMessage(ChatColor.RED + "No warp could be found matching that name!");
         }
     }
 
