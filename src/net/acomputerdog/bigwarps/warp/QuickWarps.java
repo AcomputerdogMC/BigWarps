@@ -5,19 +5,19 @@ import java.util.Map;
 
 /**
  * Maps "simple" warp names to "real" warp names for easy warping.
- * Simple warp names are just the names that were assigned at creation, like "house" or "castle".
- * Real warp names are the owner's *current* name, followed by a dot, then the simple name.
- * The owner's name is updated at each startup
+ *  Simple warp names are just the names that were assigned at creation, like "house" or "castle".
+ *  Real warp names are the owner's *current* name, followed by a dot, then the simple name.
+ *  The owner's name is updated at each startup
  * A particular simple -> real mapping is only valid if there is only one warp with the same real name.
- * If two or more players all have a public warp named "house", then quickwarps will be disabled.
- * Those players will still be able to easily warp, however, because their own house will be considered a private
- * warp and take priority.
- * Other players will have to specify a real name.
+ *  If two or more players all have a public warp named "house", then quickwarps will be disabled.
+ *  Those players will still be able to easily warp, however, because their own house will be considered a private
+ *    warp and take priority.
+ *  Other players will have to specify a real name.
  * Example: player1 has a public warp called "lit_house".
- * player1 can use the simple name "lit_house" because their own private warp takes priority.
- * Normally other players would have to use the "real name" of "player1.lit_house", however
- * quickwarps will map "lit_house" to "player1.lit_house" automatically.
- * However if player2 also builds a "lit_house" then quickwarps will be disabled because of the conflict.
+ *  player1 can use the simple name "lit_house" because their own private warp takes priority.
+ *  Normally other players would have to use the "real name" of "player1.lit_house", however
+ *  quickwarps will map "lit_house" to "player1.lit_house" automatically.
+ *  However if player2 also builds a "lit_house" then quickwarps will be disabled because of the conflict.
  */
 public class QuickWarps {
     //map of simple names to real names
