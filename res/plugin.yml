@@ -1,6 +1,6 @@
 name: BigWarps
 main: net.acomputerdog.bigwarps.PluginBigWarps
-version: 0.1.0
+version: 0.2.0
 description: Allows players to create public and private warp points
 author: acomputerdog
 
@@ -34,7 +34,7 @@ commands:
     description: Warps to a warp point
     permission: bigwarps.command.warp
     usage: /warp [player.]<name>
-    aliases: bwwarp
+    aliases: [bwwarp]
   mkwarp:
     description: Creates or edits a warp
     permission: bigwarps.command.mkwarp
@@ -69,6 +69,11 @@ commands:
     permission: bigwarps.tp.use
     usage: /tp <args>
     aliases: [bwtp, teleport, bwteleport]
+  bed:
+    description: Return to your spawn bed
+    permission: bigwarps.command.bed
+    usage: /bed
+    aliases: [bwbed]
 
 permissions:
   bigwarps.command.back:
@@ -98,6 +103,9 @@ permissions:
   bigwarps.command.reload:
     description: Use /bwreload
     default: op
+  bigwarps.command.bed:
+    description: Use /bed
+    default: true
   bigwarps.tp.force:
     description: Force user to be able to access /tp
     default: false

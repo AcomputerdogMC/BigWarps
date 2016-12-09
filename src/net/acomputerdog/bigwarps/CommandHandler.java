@@ -80,6 +80,9 @@ public class CommandHandler {
                 case "tp":
                     cmdTp(p, args);
                     break;
+                case "bed":
+                    cmdBed(p);
+                    break;
                 default:
                     sendRed("Bug detected: unknown command passed to plugin!  Please report this!");
                     plugin.getLogger().severe("Unknown command passed to plugin: " + command.getName());
@@ -382,6 +385,14 @@ public class CommandHandler {
             if (p.performCommand(cmd.toString())) {
                 tpMap.setReturnPoint(p, l);
             }
+        }
+    }
+
+    private void cmdBed(Player p) {
+        if (checkPermsPlayer(p, "bigwarps.command.bed")) {
+            sendAqua("Warped to home bed.");
+            tpMap.updateReturnPoint(p);
+            p.teleport(p.getBedSpawnLocation());
         }
     }
 
