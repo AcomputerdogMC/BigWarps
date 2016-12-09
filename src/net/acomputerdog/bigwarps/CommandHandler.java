@@ -234,6 +234,9 @@ public class CommandHandler {
             if (chr >= 65 && chr <= 90) {
                 continue;
             }
+            if (chr >= 48 && chr <= 57) {
+                continue;
+            }
             if (chr == 95) {
                 continue;
             }
