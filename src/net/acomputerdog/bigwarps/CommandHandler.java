@@ -53,7 +53,7 @@ public class CommandHandler {
                     cmdWarp(p, args);
                     break;
                 case "mkwarp":
-                    cmdMkwarp(p, args);
+                    cmdMkwarp(sender, p, args);
                     break;
                 case "rmwarp":
                     cmdRmwarp(sender, args);
@@ -172,8 +172,8 @@ public class CommandHandler {
         }
     }
 
-    private void cmdMkwarp(Player p, String[] args) {
-        if (checkPerms(p, "bigwarps.command.mkwarp")) {
+    private void cmdMkwarp(CommandSender s, Player p, String[] args) {
+        if (checkPerms(s, "bigwarps.command.mkwarp")) {
             if (args.length == 1) {
                 //can be null if used by console or command block
                 if (p != null) {
@@ -206,7 +206,7 @@ public class CommandHandler {
 
     private void makeWarp(WarpOwner owner, String name, String world, double x, double y, double z) {
         if (warpNameValid(name)) {
-            Warp warp = new Warp(plugin, x, y, z, world, owner, name, Warp.now(), false);
+            Warp warp = new Warp(plugin, x, y, z, world, owner, name, Warp.now(), true);
             warps.addWarp(warp);
             sendAqua("Warp created.");
         } else {
