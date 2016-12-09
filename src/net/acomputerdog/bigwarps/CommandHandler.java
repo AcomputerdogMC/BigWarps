@@ -312,7 +312,7 @@ public class CommandHandler {
             }
 
             //if we have reached this point, then a UUID was found.
-            PlayerWarps privateWarps = warps.getWarpsForPlayer(uuid);
+            PlayerWarps privateWarps = warps.getPrivateWarps(uuid);
             sendYellow("Personal warps:");
             for (Warp warp : privateWarps) {
                 String visibility = warp.isPublic() ? "public" : "private";
@@ -335,7 +335,7 @@ public class CommandHandler {
         if (checkPermsPlayer(p, "bigwarps.cmd.setpublic")) {
             if (args.length == 1) {
                 String name = args[0];
-                PlayerWarps priv = warps.getWarpsForPlayer(p.getUniqueId());
+                PlayerWarps priv = warps.playerWarpsFor(p.getUniqueId());
                 PlayerWarps pub = warps.getPublicWarps();
                 Warp warp = priv.removeWarp(name);
                 if (warp != null) {

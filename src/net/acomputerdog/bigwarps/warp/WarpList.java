@@ -35,7 +35,7 @@ public class WarpList {
     }
 
     public Warp getWarp(UUID owner, String name) {
-        PlayerWarps warps = getPlayerWarps(owner);
+        PlayerWarps warps = playerWarpsFor(owner);
         Warp warp = warps.getWarp(name);
         if (warp == null) {
             //fall back on public warps if owner is null or owner does not have a warp by that name
@@ -49,7 +49,7 @@ public class WarpList {
             publicWarps.addWarp(warp);
             savePublicWarps();
         } else {
-            PlayerWarps warps = getPlayerWarps(warp.getOwner().getUuid());
+            PlayerWarps warps = playerWarpsFor(warp.getOwner().getUuid());
             warps.addWarp(warp);
             savePlayerWarps(warps);
         }
@@ -60,13 +60,13 @@ public class WarpList {
             publicWarps.removeWarp(warp.getName());
             savePublicWarps();
         } else {
-            PlayerWarps warps = getPlayerWarps(warp.getOwner().getUuid());
+            PlayerWarps warps = playerWarpsFor(warp.getOwner().getUuid());
             warps.removeWarp(warp.getName());
             savePlayerWarps(warps);
         }
     }
 
-    private PlayerWarps getPlayerWarps(UUID uuid) {
+    public PlayerWarps playerWarpsFor(UUID uuid) {
         if (uuid == null) {
             throw new IllegalArgumentException("Cannot get warps for null player, use getPublicWarps() instead!");
         }
@@ -77,8 +77,8 @@ public class WarpList {
         return warps;
     }
 
-    public PlayerWarps getWarpsForPlayer(UUID uuid) {
-        return new ImmutablePlayerWarps(getPlayerWarps(uuid));
+    public PlayerWarps getPrivateWarps(UUID uuid) {
+        return new ImmutablePlayerWarps(playerWarpsFor(uuid));
     }
 
     public PlayerWarps getPublicWarps() {
