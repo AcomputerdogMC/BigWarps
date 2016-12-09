@@ -1,16 +1,15 @@
 package net.acomputerdog.bigwarps;
 
-import net.acomputerdog.bigwarps.warp.TPMap;
-import net.acomputerdog.bigwarps.warp.Warp;
-import net.acomputerdog.bigwarps.warp.WarpList;
-import net.acomputerdog.bigwarps.warp.WarpOwner;
+import net.acomputerdog.bigwarps.warp.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class CommandHandler {
@@ -185,11 +184,9 @@ public class CommandHandler {
                     sendRed("This command can only be used by a player.");
                 }
             } else if (args.length == 5) {
-                WarpOwner owner;
+                WarpOwner owner = null;
                 if (p != null) {
                     owner = new WarpOwner(p.getUniqueId(), p.getName());
-                } else {
-                    owner = WarpOwner.NO_OWNER;
                 }
                 try {
                     String world = args[1];
@@ -209,7 +206,7 @@ public class CommandHandler {
 
     private void makeWarp(WarpOwner owner, String name, String world, double x, double y, double z) {
         if (warpNameValid(name)) {
-            Warp warp = new Warp(plugin, x, y, z, world, owner, name, Warp.now(), isPublic);
+            Warp warp = new Warp(plugin, x, y, z, world, owner, name, Warp.now(), false);
             warps.addWarp(warp);
             sendAqua("Warp created.");
         } else {
@@ -274,8 +271,120 @@ public class CommandHandler {
     }
 
     private void cmdLswarps(CommandSender s, String[] args) {
-        if (checkPerms(s, "bigwarps.command.lswarps") {
+        if (checkPerms(s, "bigwarps.command.lswarps")) {
+            UUID uuid;
+            //if nothing is specified, then get warps for the current player
+            if (args.length == 0) {
+                if (s instanceof Player) {
+                    uuid = ((Player) s).getUniqueId();
+                } else {
+                    sendRed("This command must be used as a player, or you must specify who's warps to view.");
+                    return;
+                }
+                //otherwise get warps for another player
+            } else if (args.length == 1) {
+                if (s.hasPermission("bigwarps.list.showother")) {
+                    //check for logged in player names first
+                    Player p = plugin.getServer().getPlayer(args[0]);
+                    if (p != null) {
+                        uuid = p.getUniqueId();
+                    } else {
+                        try {
+                            //if that fails then try to parse at a UUID
+                            uuid = UUID.fromString(args[0]);
+                        } catch (IllegalArgumentException e) {
+                            sendRed("You (currently) must enter a valid UUID to lookup warps for an offline player.");
+                            return;
+                        }
+                    }
+                } else {
+                    sendRed("You do not have permission to view other players' warps.");
+                    return;
+                }
+            } else {
+                sendRed("Usage: /lswarps [player]");
+                return;
+            }
 
+            //if we have reached this point, then a UUID was found.
+            PlayerWarps privateWarps = warps.getWarpsForPlayer(uuid);
+            sendYellow("Personal warps:");
+            for (Warp warp : privateWarps) {
+                String visibility = warp.isPublic() ? "public" : "private";
+                s.sendMessage(ChatColor.AQUA + warp.getName() + ": " + ChatColor.BLUE + warp.locationToString() + " - " + ChatColor.DARK_PURPLE + visibility);
+            }
+        }
+    }
+
+    private void cmdLspublic(CommandSender s) {
+        if (checkPerms(s, "bigwarps.cmd.lspublic")) {
+            PlayerWarps publicWarps = warps.getPublicWarps();
+            sendYellow("Public warps:");
+            for (Warp warp : publicWarps) {
+                s.sendMessage(ChatColor.AQUA + warp.getName() + ": " + ChatColor.BLUE + warp.locationToString() + " - " + ChatColor.DARK_PURPLE + warp.getOwner());
+            }
+        }
+    }
+
+    private void cmdSetpublic(Player p, String[] args) {
+        if (checkPermsPlayer(p, "bigwarps.cmd.setpublic")) {
+            if (args.length == 1) {
+                String name = args[0];
+                PlayerWarps priv = warps.getWarpsForPlayer(p.getUniqueId());
+                PlayerWarps pub = warps.getPublicWarps();
+                Warp warp = priv.removeWarp(name);
+                if (warp != null) {
+                    warp.setPublic(true);
+                    pub.addWarp(warp);
+                    sendAqua("Warp is now public.");
+                } else {
+                    warp = pub.removeWarp(name);
+                    if (warp != null) {
+                        warp.setPublic(false);
+                        priv.addWarp(warp);
+                        sendAqua("Warp is now private.");
+                    } else {
+                        sendRed("No warp could be found matching that name!");
+                    }
+                }
+            } else {
+                sendRed("Usage: /setpublic <warp name>");
+            }
+        }
+    }
+
+    private void cmdReload(CommandSender s) {
+        if (checkPerms(s, "bigwarps.cmd.reload")) {
+            sendAqua("Reloading...");
+            plugin.onDisable();
+            plugin.onEnable();
+            sendAqua("Done.");
+        }
+    }
+
+    private void cmdTp(Player p, String[] args) {
+        if (checkPermsPlayer(p, "bigwarps.tp.use")) {
+
+            //rebuild command with minecraft teleport command
+            StringBuilder cmd = new StringBuilder((1 + args.length) * 2);
+            cmd.append("minecraft:tp");
+            for (String str : args) {
+                cmd.append(' ');
+                cmd.append(str);
+            }
+
+            //check if player has access to bypass normal /tp permissions
+            if (p.hasPermission("bigwarps.tp.force")) {
+                PermissionAttachment attachment = p.addAttachment(plugin, 1);
+                attachment.setPermission("bukkit.command.teleport", true);
+                attachment.setPermission("minecraft.command.tp", true);
+            }
+
+            Location l = p.getLocation();
+            //if player teleported successfully, then update return point (for /back)
+            if (p.performCommand(cmd.toString())) {
+                tpMap.setReturnPoint(p, l);
+            }
         }
     }
 
@@ -291,6 +400,10 @@ public class CommandHandler {
         currentSender.sendMessage(ChatColor.BLUE + message);
     }
 
+    private void sendYellow(String message) {
+        currentSender.sendMessage(ChatColor.YELLOW + message);
+    }
+
     private void sendRed(String message) {
         currentSender.sendMessage(ChatColor.RED + message);
     }
@@ -301,6 +414,10 @@ public class CommandHandler {
 
     private static void sendBlue(CommandSender p, String message) {
         p.sendMessage(ChatColor.BLUE + message);
+    }
+
+    private static void sendYellow(CommandSender p, String message) {
+        p.sendMessage(ChatColor.YELLOW + message);
     }
 
     private static void sendRed(CommandSender p, String message) {

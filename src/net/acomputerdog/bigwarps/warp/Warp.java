@@ -13,9 +13,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.UUID;
 
-import static net.acomputerdog.bigwarps.warp.WarpOwner.OWNER_NULL;
-import static net.acomputerdog.bigwarps.warp.WarpOwner.UUID_NULL;
-
 public class Warp implements Listener {
 
     private final Server server;
@@ -28,7 +25,7 @@ public class Warp implements Listener {
     private final WarpOwner owner; //owner UUID
     private final String name; //warp name
     private final long time;
-    private final boolean isPublic;
+    private boolean isPublic;
 
     //populated after load
     private World world;
@@ -86,6 +83,10 @@ public class Warp implements Listener {
         return isPublic;
     }
 
+    public void setPublic(boolean aPublic) {
+        isPublic = aPublic;
+    }
+
     public World getWorld() {
         if (world == null) {
             world = server.getWorld(worldName);
@@ -140,9 +141,8 @@ public class Warp implements Listener {
         if (Double.compare(warp.z, z) != 0) return false;
         if (time != warp.time) return false;
         if (isPublic != warp.isPublic) return false;
-        if (!server.equals(warp.server)) return false;
         if (!worldName.equals(warp.worldName)) return false;
-        if (!owner.equals(warp.owner)) return false;
+        if (owner != null ? !owner.equals(warp.owner) : warp.owner != null) return false;
         return name.equals(warp.name);
 
     }
@@ -151,15 +151,14 @@ public class Warp implements Listener {
     public int hashCode() {
         int result;
         long temp;
-        result = server.hashCode();
-        result = 31 * result + worldName.hashCode();
+        result = worldName.hashCode();
         temp = Double.doubleToLongBits(x);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(y);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(z);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
-        result = 31 * result + owner.hashCode();
+        result = 31 * result + (owner != null ? owner.hashCode() : 0);
         result = 31 * result + name.hashCode();
         result = 31 * result + (int) (time ^ (time >>> 32));
         result = 31 * result + (isPublic ? 1 : 0);
@@ -203,16 +202,13 @@ public class Warp implements Listener {
 
 
     private static WarpOwner createWarpOwner(JavaPlugin plugin, String uuidString) {
-        UUID uuid;
-        String name;
-        if (UUID_NULL.equals(uuidString)) {
-            uuid = null;
-            name = OWNER_NULL;
-        } else {
-            uuid = UUID.fromString(uuidString);
-            OfflinePlayer player = plugin.getServer().getOfflinePlayer(uuid);
-            name = player.getName();
+        if (uuidString == null) {
+            return null;
         }
+
+        UUID uuid = UUID.fromString(uuidString);
+        OfflinePlayer player = plugin.getServer().getOfflinePlayer(uuid);
+        String name = player.getName();
 
         return new WarpOwner(uuid, name);
     }

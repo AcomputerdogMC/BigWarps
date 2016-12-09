@@ -35,6 +35,10 @@ public class TPMap implements Listener {
         returnPoints.put(p, p.getLocation());
     }
 
+    public void setReturnPoint(Player p, Location l) {
+        returnPoints.put(p, l);
+    }
+
     public void onBack(Player p) {
         Location prev = returnPoints.get(p);
         if (prev != null) {

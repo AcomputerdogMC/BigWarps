@@ -1,6 +1,6 @@
 name: BigWarps
 main: net.acomputerdog.bigwarps.PluginBigWarps
-version: 0.0.0
+version: 0.0.1
 description: Allows players to create public and private warp points
 author: acomputerdog
 
@@ -119,12 +119,6 @@ permissions:
   bigwarps.warp.editothers:
     description: Edit other player's warps
     default: op
-  bigwarps.list.showprivate:
-    description: Show own private warps
-    default: true
-  bigwarps.list.showpublic:
-    description: Show public warps
-    default: true
   bigwarps.list.showother:
     description: Show other players' private warps
     default: op

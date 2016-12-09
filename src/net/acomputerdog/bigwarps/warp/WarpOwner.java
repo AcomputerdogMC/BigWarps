@@ -3,9 +3,6 @@ package net.acomputerdog.bigwarps.warp;
 import java.util.UUID;
 
 public class WarpOwner {
-    public static final String OWNER_NULL = "none";
-    public static final String UUID_NULL = "null";
-    public static final WarpOwner NO_OWNER = new WarpOwner(null, OWNER_NULL);
 
     private final UUID uuid;
     private final String uuidString;
@@ -13,7 +10,7 @@ public class WarpOwner {
 
     public WarpOwner(UUID uuid, String name) {
         this.uuid = uuid;
-        this.uuidString = (uuid == null ? UUID_NULL : uuid.toString());
+        this.uuidString = uuid.toString();
         this.name = name;
     }
 
@@ -31,10 +28,6 @@ public class WarpOwner {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public boolean isPlayer() {
-        return uuid != null;
     }
 
     @Override

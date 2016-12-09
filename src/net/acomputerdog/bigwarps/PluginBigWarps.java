@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,6 +31,7 @@ public class PluginBigWarps extends JavaPlugin implements Listener {
     public void onDisable() {
         HandlerList.unregisterAll((JavaPlugin) this);
         warps = null;
+        tpMap = null;
         commandHandler = null;
     }
 
@@ -41,12 +43,17 @@ public class PluginBigWarps extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerLogin(PlayerJoinEvent e) {
         //todo separate thread ?
-        warps.preloadPlayerWarps(e.getPlayer().getUniqueId());
+        warps.onPlayerLogin(e.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent e) {
         //todo separate thread ?
-        warps.unloadPlayerWarps(e.getPlayer().getUniqueId());
+        warps.onPlayerLogout(e.getPlayer().getUniqueId());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerDeath(PlayerDeathEvent e) {
+        tpMap.updateReturnPoint(e.getEntity());
     }
 }
