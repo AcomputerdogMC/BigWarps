@@ -20,19 +20,30 @@ public class PluginBigWarps extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        warps = new WarpList(this);
-        tpMap = new TPMap(this);
-        commandHandler = new CommandHandler(this, warps, tpMap);
+        try {
+            warps = new WarpList(this);
+            tpMap = new TPMap(this);
+            commandHandler = new CommandHandler(this, warps, tpMap);
 
-        getServer().getPluginManager().registerEvents(this, this);
+            getServer().getPluginManager().registerEvents(this, this);
+        } catch (Exception e) {
+            getLogger().severe("Exception during startup!  Plugin will be disabled.");
+            e.printStackTrace();
+            getServer().getPluginManager().disablePlugin(this);
+        }
     }
 
     @Override
     public void onDisable() {
-        HandlerList.unregisterAll((JavaPlugin) this);
-        warps = null;
-        tpMap = null;
-        commandHandler = null;
+        try {
+            HandlerList.unregisterAll((JavaPlugin) this);
+            warps = null;
+            tpMap = null;
+            commandHandler = null;
+        } catch (Exception e) {
+            getLogger().severe("Exception during shutdown!");
+            e.printStackTrace();
+        }
     }
 
     @Override

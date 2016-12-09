@@ -202,7 +202,7 @@ public class Warp implements Listener {
 
 
     private static WarpOwner createWarpOwner(JavaPlugin plugin, String uuidString) {
-        if (uuidString == null) {
+        if (uuidString == null || "null".equals(uuidString)) {
             return null;
         }
 
