@@ -2,6 +2,7 @@ package net.acomputerdog.bigwarps;
 
 import net.acomputerdog.bigwarps.warp.TPMap;
 import net.acomputerdog.bigwarps.warp.WarpList;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
@@ -66,5 +67,6 @@ public class PluginBigWarps extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerDeath(PlayerDeathEvent e) {
         tpMap.updateReturnPoint(e.getEntity());
+        e.getEntity().sendMessage(ChatColor.YELLOW + "You have died!  Use /back to return to your death point.");
     }
 }
