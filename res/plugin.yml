@@ -59,7 +59,7 @@ commands:
     description: Sets a warp to be public or not public
     permission: bigwarps.command.setpublic
     usage: /mkwarp <name>
-    aliases: [bwsetpublic]
+    aliases: [bwsetpublic, mkpublic]
   bwreload:
     description: Reload the plugin
     permission: bigwarps.command.reload
