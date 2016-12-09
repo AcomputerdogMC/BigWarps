@@ -242,7 +242,7 @@ public class CommandHandler {
 
     private void cmdRmwarp(CommandSender s, String[] args) {
         if (checkPerms(s, "bigwarps.command.rmwarp")) {
-            if (args.length == 0) {
+            if (args.length == 1) {
                 Player owner = null;
                 String name = args[0];
 
