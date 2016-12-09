@@ -5,6 +5,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Immutable subclass of PlayerWarps
+ */
 public class ImmutablePlayerWarps extends PlayerWarps {
     private final PlayerWarps passthrough;
 

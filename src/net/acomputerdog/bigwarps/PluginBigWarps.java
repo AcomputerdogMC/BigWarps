@@ -14,10 +14,13 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ * Main plugin class
+ */
 public class PluginBigWarps extends JavaPlugin implements Listener {
-    private WarpList warps;
-    private TPMap tpMap;
-    private CommandHandler commandHandler;
+    private WarpList warps; //stores list of warps
+    private TPMap tpMap; //maps player teleport requests and locations
+    private CommandHandler commandHandler; //processes commands
 
     @Override
     public void onEnable() {
@@ -37,6 +40,7 @@ public class PluginBigWarps extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         try {
+            //unregister handlers to prevent duplicate event firing (and possible memory leak)
             HandlerList.unregisterAll((JavaPlugin) this);
             warps = null;
             tpMap = null;

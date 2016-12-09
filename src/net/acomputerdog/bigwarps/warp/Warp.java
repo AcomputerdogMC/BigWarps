@@ -12,6 +12,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.UUID;
 
+/**
+ * Representation of a warp point both in the world and stored to a file
+ */
 public class Warp implements Listener {
 
     private final Server server;
@@ -21,14 +24,14 @@ public class Warp implements Listener {
     private final double y;
     private final double z;
 
-    //private final WarpOwner owner; //owner UUID
-    private final UUID owner;
-    private String ownerName; //DO NOT USE IN equals() or hashCode()
+    private final UUID owner; //UUID of owner, this should be used to check ownership
+    //TODO update at some specific interval, or when a player logs in
+    private String ownerName; //name of owner, only for printing and "real" name generation.  DO NOT USE IN equals() or hashCode()
     private final String name; //warp name
     private final long time;
     private boolean isPublic;
 
-    //populated after load
+    //populated after load.  Will be null until server starts.
     private World world;
     private Location location;
 
@@ -89,8 +92,8 @@ public class Warp implements Listener {
         return isPublic;
     }
 
-    public void setPublic(boolean aPublic) {
-        isPublic = aPublic;
+    public void setPublic(boolean isPublic) {
+        this.isPublic = isPublic;
     }
 
     public World getWorld() {

@@ -5,6 +5,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Holds a list of a single player's warps
+ */
 public class PlayerWarps implements Iterable<Warp> {
     private final UUID owner;
 

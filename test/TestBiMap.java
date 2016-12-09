@@ -2,6 +2,9 @@ import net.acomputerdog.bigwarps.util.BiMap;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Test the BiMap class
+ */
 public class TestBiMap {
 
     @Test

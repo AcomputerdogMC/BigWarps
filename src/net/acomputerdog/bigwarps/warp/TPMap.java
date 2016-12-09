@@ -12,13 +12,20 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Maps player teleport requests and location
+ */
 public class TPMap implements Listener {
+    //the time until a TPA request expires
     private static final long TPA_TIMEOUT = 2 * 20 * 60; //two minutes in ticks (at full server performance)
 
     private final PluginBigWarps plugin;
 
+    //map of player to /back return points
     private final Map<Player, Location> returnPoints;
+    //map of player -> player TPA requests
     private final BiMap<Player, Player> requestMap;
+    //map of player -> timeout IDs (generated from bukkit scheduler)
     private final Map<Player, Integer> timeoutIDMap;
 
     public TPMap(PluginBigWarps plugin) {
@@ -31,10 +38,16 @@ public class TPMap implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
+    /**
+     * Records a player's current position as their return point
+     */
     public void updateReturnPoint(Player p) {
         returnPoints.put(p, p.getLocation());
     }
 
+    /**
+     * Directly sets a player's return point
+     */
     public void setReturnPoint(Player p, Location l) {
         returnPoints.put(p, l);
     }
@@ -94,6 +107,9 @@ public class TPMap implements Listener {
         }
     }
 
+    /**
+     * Removes any TPA request from this player, then sends a "request canceled" message.
+     */
     private void expireTpa(Player p) {
         Player p2 = requestMap.removeA(p);
         if (p2 != null) {
@@ -101,13 +117,17 @@ public class TPMap implements Listener {
         }
     }
 
+    /**
+     * Register a timer to process TPA timeout
+     */
     private void startTimeout(Player p) {
-        int id = plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-            expireTpa(p);
-        }, TPA_TIMEOUT);
+        int id = plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> expireTpa(p), TPA_TIMEOUT);
         timeoutIDMap.put(p, id);
     }
 
+    /**
+     * Cancels a timeout timer.  Called when a player actually teleports.
+     */
     private void stopTimeout(Player p) {
         if (timeoutIDMap.containsKey(p)) {
             int id = timeoutIDMap.get(p);

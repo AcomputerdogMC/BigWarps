@@ -3,6 +3,12 @@ package net.acomputerdog.bigwarps.util;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A bi-directional map.  Represents a one to one relationship between two items of arbitrary type.
+ *
+ * @param <A> Type of the first item
+ * @param <B> Type of the second item
+ */
 public class BiMap<A, B> {
 
     private final Map<A, B> map1;
@@ -13,6 +19,9 @@ public class BiMap<A, B> {
         map1 = new HashMap<>();
     }
 
+    /**
+     * Maps two items together.  Will break any existing relationships between a and b
+     */
     public void put(A a, B b) {
         if (map1.containsKey(a)) {
             //remove existing mapping for a
@@ -28,6 +37,9 @@ public class BiMap<A, B> {
         map2.put(b, a);
     }
 
+    /**
+     * Get the object mapped to obj.
+     */
     public Object get(Object obj) {
         if (map1.containsKey(obj)) {
             return map1.get(obj);
@@ -38,10 +50,16 @@ public class BiMap<A, B> {
         return null;
     }
 
+    /**
+     * Gets the B item that is mapped to a
+     */
     public B getA(A a) {
         return map1.get(a);
     }
 
+    /**
+     * Gets the A item that is mapped to b
+     */
     public A getB(B b) {
         return map2.get(b);
     }

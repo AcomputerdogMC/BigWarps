@@ -15,12 +15,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.UUID;
 import java.util.logging.Level;
 
+/**
+ * Command Handler.  Takes every command line and passes it on to specific methods.
+ * Also includes lots of utility functions to simplify command processing
+ */
 public class CommandHandler {
     private final JavaPlugin plugin;
     private final WarpList warps;
     private final TPMap tpMap;
 
-    //used to simplify sending messages
+    //the sender of the current command; used to simplify sending messages
     private CommandSender currentSender = null;
 
     public CommandHandler(JavaPlugin plugin, WarpList warps, TPMap tpMap) {
@@ -89,6 +93,9 @@ public class CommandHandler {
         return true;
     }
 
+    /**
+     * Checks if a sender has all of a list of permissions.  If not print a message and return false
+     */
     private boolean checkPerms(CommandSender sender, String... perms) {
         for (String perm : perms) {
             if (!sender.hasPermission(perm)) {
@@ -99,6 +106,9 @@ public class CommandHandler {
         return true;
     }
 
+    /**
+     * Checks if a sender is a player, and if they have permissions
+     */
     private boolean checkPermsPlayer(CommandSender sender, String... perms) {
         if (sender == null || !(sender instanceof Player)) {
             sendRed("You must be a player to use this command.");
@@ -167,6 +177,7 @@ public class CommandHandler {
 
     private void cmdMkwarp(CommandSender s, Player p, String[] args) {
         if (checkPerms(s, "bigwarps.command.mkwarp")) {
+            //if the warp is at the current location
             if (args.length == 1) {
                 //can be null if used by console or command block
                 if (p != null) {
@@ -175,6 +186,7 @@ public class CommandHandler {
                 } else {
                     sendRed("This command can only be used by a player.");
                 }
+                //else if the warp is being set manually
             } else if (args.length == 5) {
                 try {
                     String world = args[1];
@@ -192,6 +204,9 @@ public class CommandHandler {
         }
     }
 
+    /**
+     * Creates a warp and adds it to the warp list
+     */
     private void makeWarp(UUID owner, String name, String world, double x, double y, double z) {
         if (warpNameValid(name)) {
             Warp warp = new Warp(plugin, x, y, z, world, owner, name, Warp.now(), true);
@@ -202,6 +217,9 @@ public class CommandHandler {
         }
     }
 
+    /**
+     * Makes a warp and adds to warp list
+     */
     private void makeWarp(UUID owner, String name, Location loc) {
         if (warpNameValid(name)) {
             Warp warp = new Warp(plugin, loc, owner, name);
@@ -212,17 +230,25 @@ public class CommandHandler {
         }
     }
 
+    /**
+     * Checks if a warp name is valid.
+     * Valid warp names have only letters, numbers, and underscores
+     */
     private boolean warpNameValid(String name) {
         for (char chr : name.toCharArray()) {
+            //lower case letters
             if (chr >= 97 && chr <= 122) {
                 continue;
             }
+            //upper case letters
             if (chr >= 65 && chr <= 90) {
                 continue;
             }
+            //numbers
             if (chr >= 48 && chr <= 57) {
                 continue;
             }
+            //underscores
             if (chr == 95) {
                 continue;
             }
@@ -247,6 +273,9 @@ public class CommandHandler {
         }
     }
 
+    /**
+     * Lists a player's private warps
+     */
     private void cmdLswarps(CommandSender s, String[] args) {
         if (checkPerms(s, "bigwarps.command.lswarps")) {
             UUID uuid;
@@ -270,6 +299,7 @@ public class CommandHandler {
                             //if that fails then try to parse at a UUID
                             uuid = UUID.fromString(args[0]);
                         } catch (IllegalArgumentException e) {
+                            //TODO write some kind of name caching library
                             sendRed("You (currently) must enter a valid UUID to lookup warps for an offline player.");
                             return;
                         }
@@ -293,6 +323,9 @@ public class CommandHandler {
         }
     }
 
+    /**
+     * List public warps
+     */
     private void cmdLspublic(CommandSender s) {
         if (checkPerms(s, "bigwarps.command.lspublic")) {
             PlayerWarps publicWarps = warps.getPublicWarps();
@@ -323,6 +356,9 @@ public class CommandHandler {
         }
     }
 
+    /**
+     * Passes through to the vanilla TP command, but records position for /back
+     */
     private void cmdTp(Player p, String[] args) {
         if (checkPermsPlayer(p, "bigwarps.tp.use")) {
 

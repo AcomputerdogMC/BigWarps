@@ -10,17 +10,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Keeps track of warp locations and states
+ */
 public class WarpList {
     private final JavaPlugin plugin;
 
-
-    //server warps are uuid null
+    //warps made by server console are uuid == null
     private final Map<UUID, PlayerWarps> privateWarps;
     private final File privateWarpsDir;
 
     private final PlayerWarps publicWarps;
     private final File publicWarpsFile;
 
+    //utility class that maps "simple" names to "full" names
+    //   ex. big_castle -> player1.big_castle
     private final QuickWarps quickWarps;
 
     public WarpList(JavaPlugin plugin) {
@@ -39,6 +43,9 @@ public class WarpList {
         loadPublicWarps();
     }
 
+    /**
+     * Looks up a warp by owner UUID and name
+     */
     public Warp getWarp(UUID owner, String name) {
         PlayerWarps warps = getPlayerWarps(owner);
         Warp warp = warps.getWarp(name);
@@ -46,6 +53,7 @@ public class WarpList {
             //fall back on public warps if owner does not have a warp by that name
             warp = publicWarps.getWarp(name);
             if (warp == null) {
+                //use quickwarps to try and look up the real name
                 String realName = quickWarps.getRealName(name);
                 if (realName != null) {
                     //fall back on quickwarps if the public name did not match
@@ -72,6 +80,9 @@ public class WarpList {
         savePublicWarps();
     }
 
+    /**
+     * Gets a list of all the warps belonging to a player
+     */
     private PlayerWarps getPlayerWarps(UUID uuid) {
         if (uuid == null) {
             throw new IllegalArgumentException("Cannot get warps for null player, use getPublicWarps() instead!");
@@ -83,14 +94,23 @@ public class WarpList {
         return warps;
     }
 
+    /**
+     * Gets all of a player's private warps
+     */
     public PlayerWarps getPrivateWarps(UUID uuid) {
         return new ImmutablePlayerWarps(getPlayerWarps(uuid));
     }
 
+    /**
+     * Get all public warps on the server
+     */
     public PlayerWarps getPublicWarps() {
         return new ImmutablePlayerWarps(publicWarps);
     }
 
+    /**
+     * Toggles a warp between public and private
+     */
     public void togglePublic(Player p, String name) {
         PlayerWarps playerWarps = getPlayerWarps(p.getUniqueId());
         Warp warp = playerWarps.getWarp(name);
@@ -99,11 +119,13 @@ public class WarpList {
             if (warp.isPublic()) {
                 publicWarps.removeWarp(realName);
                 warp.setPublic(false);
+                //notify quickwarps to check for a name collision
                 quickWarps.increaseCount(name, realName);
                 p.sendMessage(ChatColor.AQUA + "Warp is now private.");
             } else {
                 publicWarps.addWarp(realName, warp);
                 warp.setPublic(true);
+                //notify quickwarps to check if name no longer collides
                 quickWarps.decreaseCount(name, realName);
                 p.sendMessage(ChatColor.AQUA + "Warp is now public.");
             }
@@ -195,6 +217,10 @@ public class WarpList {
         }
     }
 
+    /**
+     * Converts a "simple" warp name into a full, "real" public warp name.
+     * ex. big_castle -> player1.big_castle
+     */
     private String getRealName(Warp warp) {
         return (warp.getOwnerName() + "." + warp.getName()).toLowerCase();
     }
