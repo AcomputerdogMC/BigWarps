@@ -57,13 +57,13 @@ public class WarpList {
     }
 
     public void addWarp(Warp warp) {
-        PlayerWarps warps = getPlayerWarps(warp.getOwner().getUuid());
+        PlayerWarps warps = getPlayerWarps(warp.getOwner());
         warps.addWarp(warp);
         savePlayerWarps(warps);
     }
 
     public void removeWarp(Warp warp) {
-        PlayerWarps warps = getPlayerWarps(warp.getOwner().getUuid());
+        PlayerWarps warps = getPlayerWarps(warp.getOwner());
         warps.removeWarp(warp.getName());
         savePlayerWarps(warps);
 
@@ -196,10 +196,6 @@ public class WarpList {
     }
 
     private String getRealName(Warp warp) {
-        String ownerName = "none";
-        if (warp.getOwner() != null) {
-            ownerName = warp.getOwner().getName();
-        }
-        return (ownerName + "." + warp.getName()).toLowerCase();
+        return (warp.getOwnerName() + "." + warp.getName()).toLowerCase();
     }
 }

@@ -1,6 +1,9 @@
 package net.acomputerdog.bigwarps;
 
-import net.acomputerdog.bigwarps.warp.*;
+import net.acomputerdog.bigwarps.warp.PlayerWarps;
+import net.acomputerdog.bigwarps.warp.TPMap;
+import net.acomputerdog.bigwarps.warp.Warp;
+import net.acomputerdog.bigwarps.warp.WarpList;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -168,23 +171,18 @@ public class CommandHandler {
                 //can be null if used by console or command block
                 if (p != null) {
                     Location loc = p.getLocation();
-                    WarpOwner owner = new WarpOwner(p.getUniqueId(), p.getName());
-                    makeWarp(owner, args[0], loc);
+                    makeWarp(p.getUniqueId(), args[0], loc);
                 } else {
                     sendRed("This command can only be used by a player.");
                 }
             } else if (args.length == 5) {
-                WarpOwner owner = null;
-                if (p != null) {
-                    owner = new WarpOwner(p.getUniqueId(), p.getName());
-                }
                 try {
                     String world = args[1];
                     double x = Double.parseDouble(args[2]);
                     double y = Double.parseDouble(args[3]);
                     double z = Double.parseDouble(args[4]);
 
-                    makeWarp(owner, args[0], world, x, y, z);
+                    makeWarp(p.getUniqueId(), args[0], world, x, y, z);
                 } catch (NumberFormatException e) {
                     sendRed("x, y, and z must be valid decimal numbers.");
                 }
@@ -194,7 +192,7 @@ public class CommandHandler {
         }
     }
 
-    private void makeWarp(WarpOwner owner, String name, String world, double x, double y, double z) {
+    private void makeWarp(UUID owner, String name, String world, double x, double y, double z) {
         if (warpNameValid(name)) {
             Warp warp = new Warp(plugin, x, y, z, world, owner, name, Warp.now(), true);
             warps.addWarp(warp);
@@ -204,7 +202,7 @@ public class CommandHandler {
         }
     }
 
-    private void makeWarp(WarpOwner owner, String name, Location loc) {
+    private void makeWarp(UUID owner, String name, Location loc) {
         if (warpNameValid(name)) {
             Warp warp = new Warp(plugin, loc, owner, name);
             warps.addWarp(warp);
@@ -300,13 +298,7 @@ public class CommandHandler {
             PlayerWarps publicWarps = warps.getPublicWarps();
             sendYellow("Public warps:");
             for (Warp warp : publicWarps) {
-                String owner = "none";
-                //if a warp owner is set, then use it
-                if (warp.getOwner() != null && !"null".equals(warp.getOwner().getName())) {
-                    owner = warp.getOwner().getName();
-                }
-
-                s.sendMessage(ChatColor.AQUA + warp.getName() + ": " + ChatColor.BLUE + warp.locationToString() + " - " + ChatColor.DARK_PURPLE + owner);
+                s.sendMessage(ChatColor.AQUA + warp.getName() + ": " + ChatColor.BLUE + warp.locationToString() + " - " + ChatColor.DARK_PURPLE + warp.getOwnerName());
             }
         }
     }

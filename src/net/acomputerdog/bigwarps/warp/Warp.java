@@ -1,7 +1,6 @@
 package net.acomputerdog.bigwarps.warp;
 
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -22,7 +21,9 @@ public class Warp implements Listener {
     private final double y;
     private final double z;
 
-    private final WarpOwner owner; //owner UUID
+    //private final WarpOwner owner; //owner UUID
+    private final UUID owner;
+    private String ownerName; //DO NOT USE IN equals() or hashCode()
     private final String name; //warp name
     private final long time;
     private boolean isPublic;
@@ -31,25 +32,26 @@ public class Warp implements Listener {
     private World world;
     private Location location;
 
-    public Warp(JavaPlugin plugin, Location l, WarpOwner owner, String name) {
+    public Warp(JavaPlugin plugin, Location l, UUID owner, String name) {
         this(plugin, l.getX(), l.getY(), l.getZ(), l.getWorld(), owner, name, now(), false);
         this.location = l;
     }
 
-    public Warp(JavaPlugin plugin, double x, double y, double z, String worldName, WarpOwner owner, String name, long time, boolean isPublic) {
+    public Warp(JavaPlugin plugin, double x, double y, double z, String worldName, UUID owner, String name, long time, boolean isPublic) {
         this.server = plugin.getServer();
         this.x = x;
         this.y = y;
         this.z = z;
         this.worldName = worldName;
         this.owner = owner;
+        this.ownerName = owner == null ? "none" : plugin.getServer().getOfflinePlayer(owner).getName();
         this.name = name;
         this.time = time;
         this.isPublic = isPublic;
         server.getPluginManager().registerEvents(this, plugin);
     }
 
-    public Warp(JavaPlugin plugin, double x, double y, double z, World world, WarpOwner owner, String name, long time, boolean isPublic) {
+    public Warp(JavaPlugin plugin, double x, double y, double z, World world, UUID owner, String name, long time, boolean isPublic) {
         this(plugin, x, y, z, world.getName(), owner, name, time, isPublic);
         this.world = world;
     }
@@ -67,8 +69,12 @@ public class Warp implements Listener {
         return z;
     }
 
-    public WarpOwner getOwner() {
+    public UUID getOwner() {
         return owner;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
     }
 
     public String getName() {
@@ -171,16 +177,19 @@ public class Warp implements Listener {
 
     /**
      * Parses a current format warp file.
-     * name,owner,world,x,y,z [time, public]
+     * name,owneruuid,world,x,y,z [time, public]
      */
     public static Warp parse(JavaPlugin plugin, String str) {
         if (str != null) {
             String[] parts = str.split(",");
             if (parts.length >= 6) {
-                String name = parts[0];
-                WarpOwner owner = createWarpOwner(plugin, parts[1]);
-                String world = parts[2];
                 try {
+                    String name = parts[0];
+
+                    UUID owner = UUID.fromString(parts[1]);
+
+                    String world = parts[2];
+
                     double x = Double.parseDouble(parts[3]);
                     double y = Double.parseDouble(parts[4]);
                     double z = Double.parseDouble(parts[5]);
@@ -191,25 +200,11 @@ public class Warp implements Listener {
                         isPublic = Boolean.parseBoolean(parts[7]);
                     }
 
-
                     return new Warp(plugin, x, y, z, world, owner, name, time, isPublic);
-                } catch (NumberFormatException ignored) {
-                } //will return null
+                } catch (IllegalArgumentException ignored) {
+                }//will return null
             }
         }
         return null;
-    }
-
-
-    private static WarpOwner createWarpOwner(JavaPlugin plugin, String uuidString) {
-        if (uuidString == null || "null".equals(uuidString)) {
-            return null;
-        }
-
-        UUID uuid = UUID.fromString(uuidString);
-        OfflinePlayer player = plugin.getServer().getOfflinePlayer(uuid);
-        String name = player.getName();
-
-        return new WarpOwner(uuid, name);
     }
 }
