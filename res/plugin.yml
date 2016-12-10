@@ -112,8 +112,8 @@ permissions:
   bigwarps.tp.use:
     description: Allow use of /tp (if vanilla permissions apply)
     default: true
-  bigwarps.ignoreprivatelimit:
-    description: Ignore limit on private warps
+  bigwarps.ignoretotallimit:
+    description: Ignore total warp limit
     default: op
   bigwarps.ignorepubliclimit:
     description: Ignore limit on public warps

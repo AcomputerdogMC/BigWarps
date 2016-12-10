@@ -184,7 +184,7 @@ public class CommandHandler {
                 //can be null if used by console or command block
                 if (p != null) {
                     Location loc = p.getLocation();
-                    makeWarp(p.getUniqueId(), args[0], loc);
+                    makeWarp(s, p.getUniqueId(), args[0], loc);
                 } else {
                     sendRed("This command can only be used by a player.");
                 }
@@ -196,7 +196,7 @@ public class CommandHandler {
                     double y = Double.parseDouble(args[3]);
                     double z = Double.parseDouble(args[4]);
 
-                    makeWarp(p.getUniqueId(), args[0], world, x, y, z);
+                    makeWarp(s, p.getUniqueId(), args[0], world, x, y, z);
                 } catch (NumberFormatException e) {
                     sendRed("x, y, and z must be valid decimal numbers.");
                 }
@@ -209,10 +209,10 @@ public class CommandHandler {
     /**
      * Creates a warp and adds it to the warp list
      */
-    private void makeWarp(UUID owner, String name, String world, double x, double y, double z) {
+    private void makeWarp(CommandSender sender, UUID owner, String name, String world, double x, double y, double z) {
         if (warpNameValid(name)) {
             Warp warp = new Warp(plugin, x, y, z, world, owner, name, Warp.now(), true);
-            addWarp(owner, warp);
+            addWarp(sender, owner, warp);
         } else {
             sendRed("Invalid name!  You may only use letters, numbers, and underscores.");
         }
@@ -221,17 +221,17 @@ public class CommandHandler {
     /**
      * Makes a warp and adds to warp list
      */
-    private void makeWarp(UUID owner, String name, Location loc) {
+    private void makeWarp(CommandSender sender, UUID owner, String name, Location loc) {
         if (warpNameValid(name)) {
             Warp warp = new Warp(plugin, loc, owner, name);
-            addWarp(owner, warp);
+            addWarp(sender, owner, warp);
         } else {
             sendRed("Invalid name!  You may only use letters, numbers, and underscores.");
         }
     }
 
-    private void addWarp(UUID owner, Warp warp) {
-        if (warps.getPrivateWarps(owner).getNumTotalWarps() < plugin.maxWarpsTotal) {
+    private void addWarp(CommandSender sender, UUID owner, Warp warp) {
+        if (warps.getPrivateWarps(owner).getNumTotalWarps() < plugin.maxWarpsTotal || sender.hasPermission("bigwarps.ignoreprivatelimit")) {
             warps.addWarp(warp);
             sendAqua("Warp created.");
         }

@@ -123,7 +123,7 @@ public class WarpList {
                 quickWarps.increaseCount(name, realName);
                 p.sendMessage(ChatColor.AQUA + "Warp is now private.");
             } else {
-                if (playerWarps.getNumPublicWarps() < plugin.maxPublicWarps) {
+                if (playerWarps.getNumPublicWarps() < plugin.maxPublicWarps || p.hasPermission("bigwarps.ignoretotallimit")) {
                     publicWarps.addWarp(realName, warp);
                     warp.setPublic(true);
                     //notify quickwarps to check if name no longer collides
