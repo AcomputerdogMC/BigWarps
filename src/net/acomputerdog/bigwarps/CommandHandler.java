@@ -397,7 +397,9 @@ public class CommandHandler {
         if (checkPermsPlayer(p, "bigwarps.command.bed")) {
             sendAqua("Warped to home bed.");
             tpMap.updateReturnPoint(p);
-            p.teleport(p.getBedSpawnLocation());
+            if (p.getBedSpawnLocation() != null) {
+                p.teleport(p.getBedSpawnLocation());
+            }
         }
     }
 
