@@ -1,11 +1,11 @@
 package net.acomputerdog.bigwarps.warp;
 
+import net.acomputerdog.bigwarps.PluginBigWarps;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -14,7 +14,7 @@ import java.util.UUID;
  * Keeps track of warp locations and states
  */
 public class WarpList {
-    private final JavaPlugin plugin;
+    private final PluginBigWarps plugin;
 
     //warps made by server console are uuid == null
     private final Map<UUID, PlayerWarps> privateWarps;
@@ -27,7 +27,7 @@ public class WarpList {
     //   ex. big_castle -> player1.big_castle
     private final QuickWarps quickWarps;
 
-    public WarpList(JavaPlugin plugin) {
+    public WarpList(PluginBigWarps plugin) {
         this.plugin = plugin;
 
         this.privateWarps = new HashMap<>();
@@ -123,11 +123,15 @@ public class WarpList {
                 quickWarps.increaseCount(name, realName);
                 p.sendMessage(ChatColor.AQUA + "Warp is now private.");
             } else {
-                publicWarps.addWarp(realName, warp);
-                warp.setPublic(true);
-                //notify quickwarps to check if name no longer collides
-                quickWarps.decreaseCount(name, realName);
-                p.sendMessage(ChatColor.AQUA + "Warp is now public.");
+                if (playerWarps.getNumPublicWarps() < plugin.maxPublicWarps) {
+                    publicWarps.addWarp(realName, warp);
+                    warp.setPublic(true);
+                    //notify quickwarps to check if name no longer collides
+                    quickWarps.decreaseCount(name, realName);
+                    p.sendMessage(ChatColor.AQUA + "Warp is now public.");
+                } else {
+                    p.sendMessage(ChatColor.RED + "You have too many public warps.");
+                }
             }
             savePlayerWarps(playerWarps);
             savePublicWarps();
@@ -141,7 +145,7 @@ public class WarpList {
         PlayerWarps warps = new PlayerWarps(uuid);
         if (warpFile.isFile()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(warpFile))) {
-                readWarps(plugin, reader, warps.getWarpMap(), false);
+                readWarps(plugin, reader, warps, false);
                 privateWarps.put(uuid, warps);
             } catch (IOException e) {
                 plugin.getLogger().warning("IOException reading warps for player " + uuid);
@@ -154,7 +158,7 @@ public class WarpList {
     private void loadPublicWarps() {
         if (publicWarpsFile.isFile()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(publicWarpsFile))) {
-                readWarps(plugin, reader, publicWarps.getWarpMap(), true);
+                readWarps(plugin, reader, publicWarps, true);
             } catch (IOException e) {
                 plugin.getLogger().warning("IOException reading public warps!");
                 e.printStackTrace();
@@ -172,7 +176,7 @@ public class WarpList {
 
     private void savePlayerWarps(PlayerWarps warps) {
         try (Writer writer = new FileWriter(new File(privateWarpsDir, warps.getOwner().toString() + ".lst"))) {
-            writeWarps(writer, warps.getWarpMap().values());
+            writeWarps(writer, warps);
         } catch (IOException e) {
             plugin.getLogger().warning("IOException saving warps for: " + warps.getOwner());
             e.printStackTrace();
@@ -181,21 +185,21 @@ public class WarpList {
 
     private void savePublicWarps() {
         try (Writer writer = new FileWriter(publicWarpsFile)) {
-            writeWarps(writer, publicWarps.getWarpMap().values());
+            writeWarps(writer, publicWarps);
         } catch (IOException e) {
             plugin.getLogger().warning("IOException saving public warps!");
             e.printStackTrace();
         }
     }
 
-    private void writeWarps(Writer writer, Collection<Warp> warps) throws IOException {
+    private void writeWarps(Writer writer, PlayerWarps warps) throws IOException {
         for (Warp warp : warps) {
             writer.write(warp.toString());
             writer.write("\n");
         }
     }
 
-    private void readWarps(JavaPlugin plugin, BufferedReader reader, Map<String, Warp> warps, boolean isPublic) throws IOException {
+    private void readWarps(JavaPlugin plugin, BufferedReader reader, PlayerWarps warps, boolean isPublic) throws IOException {
         while (reader.ready()) {
             String line = reader.readLine().trim();
             if (!line.startsWith("#")) {
@@ -208,7 +212,7 @@ public class WarpList {
                         name = getRealName(warp);
                         quickWarps.increaseCount(warp.getName(), name);
                     }
-                    Warp oldWarp = warps.put(name, warp);
+                    Warp oldWarp = warps.addWarp(name, warp);
                     if (oldWarp != null) {
                         plugin.getLogger().warning("Duplicate warp: \"" + warp.getName() + "\"");
                     }

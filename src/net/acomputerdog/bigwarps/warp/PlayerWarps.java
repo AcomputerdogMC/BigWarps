@@ -13,6 +13,8 @@ public class PlayerWarps implements Iterable<Warp> {
 
     private final Map<String, Warp> warps;
 
+    private int numPublicWarps = 0;
+
     public PlayerWarps(UUID owner) {
         this.owner = owner;
         this.warps = new HashMap<>();
@@ -27,14 +29,25 @@ public class PlayerWarps implements Iterable<Warp> {
     }
 
     public Warp removeWarp(String name) {
-        return warps.remove(name.toLowerCase());
+        Warp warp = warps.remove(name.toLowerCase());
+        if (warp != null) {
+            if (warp.isPublic()) {
+                numPublicWarps--;
+            }
+        }
+        return warp;
     }
 
     public Warp addWarp(String name, Warp warp) {
-        warps.remove(name);
-        return warps.put(name, warp);
-    }
+        Warp old = removeWarp(name);
+        warps.put(name, warp);
 
+        if (warp.isPublic()) {
+            numPublicWarps++;
+        }
+
+        return old;
+    }
 
     public Warp addWarp(Warp warp) {
         return addWarp(warp.getName().toLowerCase(), warp);
@@ -44,9 +57,12 @@ public class PlayerWarps implements Iterable<Warp> {
         return warps.containsKey(name);
     }
 
-    // package-private method for WarpList
-    Map<String, Warp> getWarpMap() {
-        return warps;
+    public int getNumTotalWarps() {
+        return warps.size();
+    }
+
+    public int getNumPublicWarps() {
+        return numPublicWarps;
     }
 
     @Override

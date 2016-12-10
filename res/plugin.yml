@@ -112,21 +112,18 @@ permissions:
   bigwarps.tp.use:
     description: Allow use of /tp (if vanilla permissions apply)
     default: true
-#  bigwarps.warp.ignorelimit.private:
-#    description: Ignore limit on private warps
-#    default: op
-#  bigwarps.warp.ignorelimit.public:
-#    description: Ignore limit on public warps
-#    default: op
+  bigwarps.ignoreprivatelimit:
+    description: Ignore limit on private warps
+    default: op
+  bigwarps.ignorepubliclimit:
+    description: Ignore limit on public warps
+    default: op
 #  bigwarps.warp.nocreate.private:
 #    description: Block creating private warps
 #    default: false
 #  bigwarps.warp.nocreate.public:
 #    description: Block creating public warps
 #    default: false
-#  bigwarps.warp.editothers:
-#    description: Edit other player's warps
-#    default: op
   bigwarps.list.showother:
     description: Show other players' private warps
     default: op

@@ -10,7 +10,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.UUID;
 import java.util.logging.Level;
@@ -20,14 +19,14 @@ import java.util.logging.Level;
  * Also includes lots of utility functions to simplify command processing
  */
 public class CommandHandler {
-    private final JavaPlugin plugin;
+    private final PluginBigWarps plugin;
     private final WarpList warps;
     private final TPMap tpMap;
 
     //the sender of the current command; used to simplify sending messages
     private CommandSender currentSender = null;
 
-    public CommandHandler(JavaPlugin plugin, WarpList warps, TPMap tpMap) {
+    public CommandHandler(PluginBigWarps plugin, WarpList warps, TPMap tpMap) {
         this.plugin = plugin;
         this.warps = warps;
         this.tpMap = tpMap;
@@ -213,8 +212,7 @@ public class CommandHandler {
     private void makeWarp(UUID owner, String name, String world, double x, double y, double z) {
         if (warpNameValid(name)) {
             Warp warp = new Warp(plugin, x, y, z, world, owner, name, Warp.now(), true);
-            warps.addWarp(warp);
-            sendAqua("Warp created.");
+            addWarp(owner, warp);
         } else {
             sendRed("Invalid name!  You may only use letters, numbers, and underscores.");
         }
@@ -226,11 +224,18 @@ public class CommandHandler {
     private void makeWarp(UUID owner, String name, Location loc) {
         if (warpNameValid(name)) {
             Warp warp = new Warp(plugin, loc, owner, name);
-            warps.addWarp(warp);
-            sendAqua("Warp created.");
+            addWarp(owner, warp);
         } else {
             sendRed("Invalid name!  You may only use letters, numbers, and underscores.");
         }
+    }
+
+    private void addWarp(UUID owner, Warp warp) {
+        if (warps.getPrivateWarps(owner).getNumTotalWarps() < plugin.maxWarpsTotal) {
+            warps.addWarp(warp);
+            sendAqua("Warp created.");
+        }
+        sendRed("You have too many private warps.");
     }
 
     /**

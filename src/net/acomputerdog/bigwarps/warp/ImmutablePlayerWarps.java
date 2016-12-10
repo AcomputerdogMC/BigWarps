@@ -1,8 +1,6 @@
 package net.acomputerdog.bigwarps.warp;
 
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -37,12 +35,27 @@ public class ImmutablePlayerWarps extends PlayerWarps {
     }
 
     @Override
-    Map<String, Warp> getWarpMap() {
-        return Collections.unmodifiableMap(passthrough.getWarpMap());
+    public Iterator<Warp> iterator() {
+        return passthrough.iterator();
     }
 
     @Override
-    public Iterator<Warp> iterator() {
-        return passthrough.iterator();
+    public Warp addWarp(String name, Warp warp) {
+        throw new UnsupportedOperationException("Cannot add to an immutable warp list.");
+    }
+
+    @Override
+    public boolean hasWarp(String name) {
+        return passthrough.hasWarp(name);
+    }
+
+    @Override
+    public int getNumTotalWarps() {
+        return passthrough.getNumTotalWarps();
+    }
+
+    @Override
+    public int getNumPublicWarps() {
+        return passthrough.getNumPublicWarps();
     }
 }

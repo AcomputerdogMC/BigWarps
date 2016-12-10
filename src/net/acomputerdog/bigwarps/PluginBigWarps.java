@@ -22,9 +22,18 @@ public class PluginBigWarps extends JavaPlugin implements Listener {
     private TPMap tpMap; //maps player teleport requests and locations
     private CommandHandler commandHandler; //processes commands
 
+
+    //total max warps warps per player
+    public int maxWarpsTotal = 15;
+
+    //max public warps per player
+    public int maxPublicWarps = 5;
+
     @Override
     public void onEnable() {
         try {
+            loadConfig();
+
             warps = new WarpList(this);
             tpMap = new TPMap(this);
             commandHandler = new CommandHandler(this, warps, tpMap);
@@ -40,8 +49,11 @@ public class PluginBigWarps extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         try {
-            //unregister handlers to prevent duplicate event firing (and possible memory leak)
+            //unregister handlers to prevent duplicate event firing
             HandlerList.unregisterAll((JavaPlugin) this);
+            //clear all tasks to prevent glitches or memory leaks
+            getServer().getScheduler().cancelTasks(this);
+
             warps = null;
             tpMap = null;
             commandHandler = null;
@@ -49,6 +61,13 @@ public class PluginBigWarps extends JavaPlugin implements Listener {
             getLogger().severe("Exception during shutdown!");
             e.printStackTrace();
         }
+    }
+
+    private void loadConfig() {
+        saveDefaultConfig(); //only saves if it doesn't actually exist
+
+        maxWarpsTotal = getConfig().getInt("total_warps_limit", maxWarpsTotal);
+        maxPublicWarps = getConfig().getInt("public_warps_limit", maxPublicWarps);
     }
 
     @Override
