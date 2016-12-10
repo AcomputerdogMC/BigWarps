@@ -88,7 +88,7 @@ public class CommandHandler {
                     break;
             }
         } catch (Exception e) {
-            sendRed("An exception occurred while running this command!");
+            sendRed("An error occurred while running this command!");
             plugin.getLogger().log(Level.SEVERE, "Exception occurred running command!", e);
         }
         currentSender = null;
