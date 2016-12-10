@@ -118,12 +118,6 @@ permissions:
   bigwarps.ignorepubliclimit:
     description: Ignore limit on public warps
     default: op
-#  bigwarps.warp.nocreate.private:
-#    description: Block creating private warps
-#    default: false
-#  bigwarps.warp.nocreate.public:
-#    description: Block creating public warps
-#    default: false
   bigwarps.list.showother:
     description: Show other players' private warps
     default: op
