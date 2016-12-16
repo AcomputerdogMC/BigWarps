@@ -63,74 +63,74 @@ public class TPMap implements Listener {
         }
     }
 
-    public void onTpa(Player p1, Player p2) {
-        if (requestMap.containsA(p1)) {
-            cancelSentTpa(p1);
+    public void onTpa(Player sender, Player target) {
+        if (requestMap.containsA(sender)) {
+            cancelSentTpa(sender);
         }
-        if (requestMap.containsB(p2)) {
-            cancelReceivedTpa(p2);
+        if (requestMap.containsB(target)) {
+            cancelReceivedTpa(target);
         }
 
-        p1.sendMessage(ChatColor.YELLOW + "Teleport request sent to " + p2.getName() + ".");
-        p2.sendMessage(ChatColor.YELLOW + p1.getName() + " has requested to teleport to you.  Use /tpaccept to accept, or /tpdeny to deny.");
-        requestMap.put(p1, p2);
-        startTimeout(p1);
+        sender.sendMessage(ChatColor.YELLOW + "Teleport request sent to " + target.getName() + ".");
+        target.sendMessage(ChatColor.YELLOW + sender.getName() + " has requested to teleport to you.  Use /tpaccept to accept, or /tpdeny to deny.");
+        requestMap.put(sender, target);
+        startTimeout(sender);
     }
 
-    public void cancelSentTpa(Player p) {
-        Player p2 = requestMap.removeA(p);
-        if (p2 != null) {
-            sendTpaCancel(p, p2);
-            stopTimeout(p);
-        }
-    }
-
-    public void cancelReceivedTpa(Player p) {
-        Player p1 = requestMap.removeB(p);
-        if (p1 != null) {
-            sendTpaCancel(p1, p);
-            stopTimeout(p1);
+    public void cancelSentTpa(Player sender) {
+        Player target = requestMap.removeA(sender);
+        if (target != null) {
+            sendTpaCancel(sender, target);
+            stopTimeout(sender);
         }
     }
 
-    public void onTpaccept(Player p2) {
-        Player p1 = requestMap.removeB(p2);
+    public void cancelReceivedTpa(Player target) {
+        Player sender = requestMap.removeB(target);
+        if (sender != null) {
+            sendTpaCancel(sender, target);
+            stopTimeout(sender);
+        }
+    }
 
-        if (p1 != null) {
-            p1.sendMessage(ChatColor.YELLOW + "Teleporting to " + p2.getName() + ".");
-            p2.sendMessage(ChatColor.YELLOW + "Request from " + p1.getName() + " accepted.");
-            updateReturnPoint(p1);
-            p1.teleport(p2);
-            stopTimeout(p1);
+    public void onTpaccept(Player target) {
+        Player sender = requestMap.removeB(target);
+
+        if (sender != null) {
+            sender.sendMessage(ChatColor.YELLOW + "Teleporting to " + target.getName() + ".");
+            target.sendMessage(ChatColor.YELLOW + "Request from " + sender.getName() + " accepted.");
+            updateReturnPoint(sender);
+            sender.teleport(target);
+            stopTimeout(sender);
         } else {
-            p2.sendMessage(ChatColor.RED + "No one has requested to teleport to you.");
+            target.sendMessage(ChatColor.RED + "No one has requested to teleport to you.");
         }
     }
 
     /**
      * Removes any TPA request from this player, then sends a "request canceled" message.
      */
-    private void expireTpa(Player p) {
-        Player p2 = requestMap.removeA(p);
+    private void expireTpa(Player from) {
+        Player p2 = requestMap.removeA(from);
         if (p2 != null) {
-            sendTpaCancel(p, p2);
+            sendTpaCancel(from, p2);
         }
     }
 
     /**
      * Register a timer to process TPA timeout
      */
-    private void startTimeout(Player p) {
-        int id = plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> expireTpa(p), TPA_TIMEOUT);
-        timeoutIDMap.put(p, id);
+    private void startTimeout(Player from) {
+        int id = plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> expireTpa(from), TPA_TIMEOUT);
+        timeoutIDMap.put(from, id);
     }
 
     /**
      * Cancels a timeout timer.  Called when a player actually teleports.
      */
-    private void stopTimeout(Player p) {
-        if (timeoutIDMap.containsKey(p)) {
-            int id = timeoutIDMap.get(p);
+    private void stopTimeout(Player from) {
+        if (timeoutIDMap.containsKey(from)) {
+            int id = timeoutIDMap.get(from);
             plugin.getServer().getScheduler().cancelTask(id);
         }
     }

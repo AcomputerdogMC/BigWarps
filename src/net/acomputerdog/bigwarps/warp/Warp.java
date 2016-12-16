@@ -188,14 +188,13 @@ public class Warp implements Listener {
             if (parts.length >= 6) {
                 try {
                     String name = parts[0];
-
                     UUID owner = UUID.fromString(parts[1]);
 
                     String world = parts[2];
-
                     double x = Double.parseDouble(parts[3]);
                     double y = Double.parseDouble(parts[4]);
                     double z = Double.parseDouble(parts[5]);
+
                     long time = now();
                     boolean isPublic = false;
                     if (parts.length >= 8) {
