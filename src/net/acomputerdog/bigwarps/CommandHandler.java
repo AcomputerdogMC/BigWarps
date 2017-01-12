@@ -234,8 +234,9 @@ public class CommandHandler {
         if (warps.getPrivateWarps(owner).getNumTotalWarps() < plugin.maxWarpsTotal || sender.hasPermission("bigwarps.ignoreprivatelimit")) {
             warps.addWarp(warp);
             sendAqua("Warp created.");
+        } else {
+            sendRed("You have too many private warps.");
         }
-        sendRed("You have too many private warps.");
     }
 
     /**
