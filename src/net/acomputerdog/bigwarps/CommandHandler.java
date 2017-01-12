@@ -231,7 +231,7 @@ public class CommandHandler {
     }
 
     private void addWarp(CommandSender sender, UUID owner, Warp warp) {
-        if (warps.getPrivateWarps(owner).getNumTotalWarps() < plugin.maxWarpsTotal || sender.hasPermission("bigwarps.ignoreprivatelimit")) {
+        if (warps.getPrivateWarps(owner).getNumTotalWarps() < plugin.maxWarpsTotal || sender.hasPermission("bigwarps.ignoretotallimit")) {
             warps.addWarp(warp);
             sendAqua("Warp created.");
         } else {
