@@ -1,6 +1,6 @@
-name: BigWarps
+name: ${name}
+version: ${version}
 main: net.acomputerdog.bigwarps.PluginBigWarps
-version: 0.2.1
 description: Allows players to create public and private warp points
 author: acomputerdog
 

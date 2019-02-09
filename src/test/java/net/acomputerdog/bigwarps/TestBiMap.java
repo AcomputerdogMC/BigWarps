@@ -1,3 +1,5 @@
+package net.acomputerdog.bigwarps;
+
 import net.acomputerdog.bigwarps.util.BiMap;
 import org.junit.Assert;
 import org.junit.Test;
