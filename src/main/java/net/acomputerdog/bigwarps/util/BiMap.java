@@ -6,6 +6,8 @@ import java.util.Map;
 /**
  * A bi-directional map.  Represents a one to one relationship between two items of arbitrary type.
  *
+ * TODO a database could do this natively...
+ *
  * @param <A> Type of the first item
  * @param <B> Type of the second item
  */
@@ -38,19 +40,6 @@ public class BiMap<A, B> {
     }
 
     /**
-     * Get the object mapped to obj.
-     */
-    public Object get(Object obj) {
-        if (map1.containsKey(obj)) {
-            return map1.get(obj);
-        }
-        if (map2.containsKey(obj)) {
-            return map2.get(obj);
-        }
-        return null;
-    }
-
-    /**
      * Gets the B item that is mapped to a
      */
     public B getA(A a) {
@@ -64,26 +53,12 @@ public class BiMap<A, B> {
         return map2.get(b);
     }
 
-    public boolean contains(Object obj) {
-        return map1.containsKey(obj) || map2.containsKey(obj);
-    }
-
     public boolean containsA(A a) {
         return map1.containsKey(a);
     }
 
     public boolean containsB(B b) {
         return map2.containsKey(b);
-    }
-
-    public Object remove(Object obj) {
-        if (map1.containsKey(obj)) {
-            return removeA((A) obj);
-        }
-        if (map2.containsKey(obj)) {
-            return removeB((B) obj);
-        }
-        return null;
     }
 
     public B removeA(A a) {

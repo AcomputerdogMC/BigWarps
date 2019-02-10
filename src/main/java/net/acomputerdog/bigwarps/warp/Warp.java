@@ -10,10 +10,13 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
  * Representation of a warp point both in the world and stored to a file
+ *
+ * TODO this definitely needs to be a database
  */
 public class Warp implements Listener {
 
@@ -151,7 +154,7 @@ public class Warp implements Listener {
         if (time != warp.time) return false;
         if (isPublic != warp.isPublic) return false;
         if (!worldName.equals(warp.worldName)) return false;
-        if (owner != null ? !owner.equals(warp.owner) : warp.owner != null) return false;
+        if (!Objects.equals(owner, warp.owner)) return false;
         return name.equals(warp.name);
 
     }
@@ -186,27 +189,25 @@ public class Warp implements Listener {
         if (str != null) {
             String[] parts = str.split(",");
             if (parts.length >= 6) {
-                try {
-                    String name = parts[0];
-                    UUID owner = UUID.fromString(parts[1]);
+                String name = parts[0];
+                UUID owner = UUID.fromString(parts[1]);
 
-                    String world = parts[2];
-                    double x = Double.parseDouble(parts[3]);
-                    double y = Double.parseDouble(parts[4]);
-                    double z = Double.parseDouble(parts[5]);
+                String world = parts[2];
+                double x = Double.parseDouble(parts[3]);
+                double y = Double.parseDouble(parts[4]);
+                double z = Double.parseDouble(parts[5]);
 
-                    long time = now();
-                    boolean isPublic = false;
-                    if (parts.length >= 8) {
-                        time = Long.parseLong(parts[6]);
-                        isPublic = Boolean.parseBoolean(parts[7]);
-                    }
+                long time = now();
+                boolean isPublic = false;
+                if (parts.length >= 8) {
+                    time = Long.parseLong(parts[6]);
+                    isPublic = Boolean.parseBoolean(parts[7]);
+                }
 
-                    return new Warp(plugin, x, y, z, world, owner, name, time, isPublic);
-                } catch (IllegalArgumentException ignored) {
-                }//will return null
+                return new Warp(plugin, x, y, z, world, owner, name, time, isPublic);
             }
         }
-        return null;
+
+        throw new IllegalArgumentException("String is not a valid warp definition");
     }
 }

@@ -71,11 +71,6 @@ public class QuickWarps {
     }
 
     private int getNameCount(String shortName) {
-        Integer i = nameCount.get(shortName);
-        if (i == null) {
-            nameCount.put(shortName, 0);
-            i = 0;
-        }
-        return i;
+        return nameCount.computeIfAbsent(shortName, k -> 0);
     }
 }

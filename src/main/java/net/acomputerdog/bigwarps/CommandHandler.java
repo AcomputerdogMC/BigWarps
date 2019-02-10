@@ -112,7 +112,7 @@ public class CommandHandler {
      * Checks if a sender is a player, and if they have permissions
      */
     private boolean checkPermsPlayer(CommandSender sender, String... perms) {
-        if (sender == null || !(sender instanceof Player)) {
+        if (!(sender instanceof Player)) {
             sendRed("You must be a player to use this command.");
             return false;
         }
@@ -231,7 +231,7 @@ public class CommandHandler {
     }
 
     private void addWarp(CommandSender sender, UUID owner, Warp warp) {
-        if (warps.getPrivateWarps(owner).getNumTotalWarps() < plugin.maxWarpsTotal || sender.hasPermission("bigwarps.ignoretotallimit")) {
+        if (warps.getPrivateWarps(owner).getNumTotalWarps() < plugin.getMaxWarpsTotal() || sender.hasPermission("bigwarps.ignoretotallimit")) {
             warps.addWarp(warp);
             sendAqua("Warp created.");
         } else {

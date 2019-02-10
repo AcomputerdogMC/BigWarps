@@ -14,6 +14,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.logging.Level;
+
 /**
  * Main plugin class
  */
@@ -24,10 +26,10 @@ public class PluginBigWarps extends JavaPlugin implements Listener {
 
 
     //total max warps warps per player
-    public int maxWarpsTotal = 15;
+    private int maxWarpsTotal = 15;
 
     //max public warps per player
-    public int maxPublicWarps = 5;
+    private int maxPublicWarps = 5;
 
     @Override
     public void onEnable() {
@@ -40,8 +42,7 @@ public class PluginBigWarps extends JavaPlugin implements Listener {
 
             getServer().getPluginManager().registerEvents(this, this);
         } catch (Exception e) {
-            getLogger().severe("Exception during startup!  Plugin will be disabled.");
-            e.printStackTrace();
+            getLogger().log(Level.SEVERE, "Exception during startup.  Plugin will be disabled.", e);
             getServer().getPluginManager().disablePlugin(this);
         }
     }
@@ -58,8 +59,7 @@ public class PluginBigWarps extends JavaPlugin implements Listener {
             tpMap = null;
             commandHandler = null;
         } catch (Exception e) {
-            getLogger().severe("Exception during shutdown!");
-            e.printStackTrace();
+            getLogger().log(Level.SEVERE, "Exception during shutdown.", e);
         }
     }
 
@@ -91,5 +91,13 @@ public class PluginBigWarps extends JavaPlugin implements Listener {
     public void onPlayerDeath(PlayerDeathEvent e) {
         tpMap.updateReturnPoint(e.getEntity());
         e.getEntity().sendMessage(ChatColor.YELLOW + "You have died!  Use /back to return to your death point.");
+    }
+
+    public int getMaxWarpsTotal() {
+        return maxWarpsTotal;
+    }
+
+    public int getMaxPublicWarps() {
+        return maxPublicWarps;
     }
 }

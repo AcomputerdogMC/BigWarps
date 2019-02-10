@@ -14,10 +14,12 @@ import java.util.Map;
 
 /**
  * Maps player teleport requests and location
+ *
+ * //TODO database?  Maybe for parts?
  */
 public class TPMap implements Listener {
     //the time until a TPA request expires
-    private static final long TPA_TIMEOUT = 2 * 20 * 60; //two minutes in ticks (at full server performance)
+    private static final long TPA_TIMEOUT = 2L * 20L * 60L; //two minutes in ticks (at full server performance)
 
     private final PluginBigWarps plugin;
 
@@ -52,6 +54,9 @@ public class TPMap implements Listener {
         returnPoints.put(p, l);
     }
 
+    /**
+     * Teleports a player back to their previous warp point
+     */
     public void onBack(Player p) {
         Location prev = returnPoints.get(p);
         if (prev != null) {
@@ -63,6 +68,9 @@ public class TPMap implements Listener {
         }
     }
 
+    /**
+     * Sends a TPA request from one player to another
+     */
     public void onTpa(Player sender, Player target) {
         if (requestMap.containsA(sender)) {
             cancelSentTpa(sender);
@@ -77,6 +85,9 @@ public class TPMap implements Listener {
         startTimeout(sender);
     }
 
+    /**
+     * Cancels a TPA request from the sender side
+     */
     public void cancelSentTpa(Player sender) {
         Player target = requestMap.removeA(sender);
         if (target != null) {
@@ -85,6 +96,9 @@ public class TPMap implements Listener {
         }
     }
 
+    /**
+     * Cancels a TPA request from the receiver side
+     */
     public void cancelReceivedTpa(Player target) {
         Player sender = requestMap.removeB(target);
         if (sender != null) {
@@ -93,6 +107,9 @@ public class TPMap implements Listener {
         }
     }
 
+    /**
+     * Accepts a tp request
+     */
     public void onTpaccept(Player target) {
         Player sender = requestMap.removeB(target);
 

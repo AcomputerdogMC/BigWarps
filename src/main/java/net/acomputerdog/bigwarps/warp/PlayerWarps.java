@@ -7,6 +7,8 @@ import java.util.UUID;
 
 /**
  * Holds a list of a single player's warps
+ *
+ * TODO database
  */
 public class PlayerWarps implements Iterable<Warp> {
     private final UUID owner;
@@ -30,10 +32,8 @@ public class PlayerWarps implements Iterable<Warp> {
 
     public Warp removeWarp(String name) {
         Warp warp = warps.remove(name.toLowerCase());
-        if (warp != null) {
-            if (warp.isPublic()) {
-                numPublicWarps--;
-            }
+        if (warp != null && warp.isPublic()) {
+            numPublicWarps--;
         }
         return warp;
     }
